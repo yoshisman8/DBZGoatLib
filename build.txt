@@ -1,0 +1,7 @@
+displayName = Vyklade's DBT Transformation Lib
+author = Vyklade
+version = 0.1
+modReferences = DBZMODPORT
+includeSource = false
+hideResources = true
+hideCode = true
