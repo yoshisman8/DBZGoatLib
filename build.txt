@@ -1,6 +1,6 @@
 displayName = Vyklade's DBT Transformation Lib
 author = Vyklade
-version = 1
+version = 1.0
 modReferences = DBZMODPORT
 sortAfter = dbzcalamity
 includeSource = false
