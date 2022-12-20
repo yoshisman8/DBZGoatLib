@@ -8,7 +8,7 @@ using Terraria;
 
 namespace DBZGoatLib.Model
 {
-    public readonly struct TransformationInfo
+    public readonly record struct TransformationInfo
     {
         public readonly string buffKeyName;
         public readonly int buffID;

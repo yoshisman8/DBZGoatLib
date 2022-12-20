@@ -10,7 +10,7 @@ namespace DBZGoatLib
 	{
 		public static DBZGoatLib Instance;
 		public static Mod DBZMOD;
-        
+        public static Mod DBCAMOD;
         
 
         public override void Load()
@@ -26,6 +26,10 @@ namespace DBZGoatLib
                 TransformationHandler.TransformKey = (ModKeybind)MyPlayer.GetField("transform").GetValue(null);
                 TransformationHandler.PowerDownKey = (ModKeybind)MyPlayer.GetField("powerDown").GetValue(null);
                 TransformationHandler.EnergyChargeKey = (ModKeybind)MyPlayer.GetField("energyCharge").GetValue(null);
+            }
+            if(ModLoader.TryGetMod("dbzcalamity", out Mod dbca))
+            {
+                DBCAMOD = dbca;
             }
         }
         

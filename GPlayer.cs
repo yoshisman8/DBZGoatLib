@@ -34,6 +34,8 @@ namespace DBZGoatLib
         internal AnimationData previousAnimation;
 
         internal DateTime? LastMasteryTick;
+        internal DateTime? LastHitEnemy;
+        internal DateTime? LastHit;
 
 
         public override void SaveData(TagCompound tag)
@@ -235,9 +237,14 @@ namespace DBZGoatLib
                     return;
             if (!TransformationHandler.IsTransformed(Player))
                 return;
+            if(!LastHitEnemy.HasValue)
+                LastHitEnemy = DateTime.Now;
+
+            if ((DateTime.Now - LastHitEnemy.Value).TotalMilliseconds < 500)
+                return;
+            LastHitEnemy = DateTime.Now;
 
             var transformation = TransformationHandler.GetCurrentTransformation(Player).Value;
-
             HandleMasteryGain(transformation);
         }
 
@@ -245,6 +252,13 @@ namespace DBZGoatLib
         {
             if (!TransformationHandler.IsTransformed(Player))
                 return;
+
+            if (!LastHit.HasValue)
+                LastHit = DateTime.Now;
+
+            if ((DateTime.Now - LastHit.Value).TotalMilliseconds < 500)
+                return;
+            LastHit = DateTime.Now;
 
             var transformation = TransformationHandler.GetCurrentTransformation(Player).Value;
 
@@ -254,6 +268,13 @@ namespace DBZGoatLib
         {
             if (!TransformationHandler.IsTransformed(Player))
                 return;
+
+            if (!LastHit.HasValue)
+                LastHit = DateTime.Now;
+
+            if ((DateTime.Now - LastHit.Value).TotalMilliseconds < 500)
+                return;
+            LastHit = DateTime.Now;
 
             var transformation = TransformationHandler.GetCurrentTransformation(Player).Value;
 

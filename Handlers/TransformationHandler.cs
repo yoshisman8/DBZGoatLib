@@ -30,6 +30,14 @@ namespace DBZGoatLib.Handlers
             "LSSJ2Buff",
             "LSSJ3Buff"
         };
+
+        private static List<string> DBCAForms => new List<string>
+        {
+            "UIBuff",
+            "UISignBuff",
+            "UEBuff"
+        };
+
         /// <summary>
         /// The Transform keybind registered by DBT.
         /// </summary>
@@ -138,7 +146,7 @@ namespace DBZGoatLib.Handlers
         /// <summary>
         /// Checks whether the user is transformed or not.
         /// </summary>
-        public static bool IsTransformed(Player player, bool IgnoreDBTtransformations = true)
+        public static bool IsTransformed(Player player, bool IgnoreDBTtransformations = true, bool ignoreDBCATransformations = true)
         {
             foreach (var trans in Transformations)
             {
@@ -147,10 +155,22 @@ namespace DBZGoatLib.Handlers
             }
             if (!IgnoreDBTtransformations)
             {
-                foreach (var Dtrans in DBTForms)
+                if (ModLoader.HasMod("DBZMODPORT"))
                 {
-                    if (player.HasBuff(DBZGoatLib.DBZMOD.Find<ModBuff>(Dtrans).Type))
-                        return true;
+                    foreach (var ext in DBTForms)
+                    {
+                        if (player.HasBuff(DBZGoatLib.DBZMOD.Find<ModBuff>(ext).Type))
+                            return true;
+                    }
+                }
+
+                if (ModLoader.HasMod("dbzcalamity"))
+                {
+                    foreach (var ext in DBCAForms)
+                    {
+                        if (player.HasBuff(DBZGoatLib.DBCAMOD.Find<ModBuff>(ext).Type))
+                            return true;
+                    }
                 }
             }
             return false;
@@ -173,13 +193,32 @@ namespace DBZGoatLib.Handlers
         /// Checks whether the provided player has a transformation other than the one passed. Useful for checking for overlapps!
         /// Returns true if an overlap was found.
         /// </summary>
-        public static bool IsAnythingBut(Player player, int buffId)
+        public static bool IsAnythingBut(Player player, int buffId, bool includeExternal = false)
         {
             foreach (var trans in Transformations)
             {
                 if (player.HasBuff(trans.buffID) && trans.buffID != buffId)
                     return true;
             }
+
+            if (ModLoader.HasMod("DBZMODPORT") && includeExternal)
+            {
+                foreach(var ext in DBTForms)
+                {
+                    if (player.HasBuff(DBZGoatLib.DBZMOD.Find<ModBuff>(ext).Type))
+                        return true;
+                }
+            }
+
+            if (ModLoader.HasMod("dbzcalamity") && includeExternal)
+            {
+                foreach (var ext in DBCAForms)
+                {
+                    if (player.HasBuff(DBZGoatLib.DBCAMOD.Find<ModBuff>(ext).Type))
+                        return true;
+                }
+            }
+
             return false;
         }
     }
