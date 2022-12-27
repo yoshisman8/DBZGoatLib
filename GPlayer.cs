@@ -83,6 +83,11 @@ namespace DBZGoatLib
                     MasteryMaxed.Add(trans.buffID, false);
             }
         }
+        public override void PlayerDisconnect(Player player)
+        {
+            TransformationHandler.ClearTransformations(player);
+        }
+
         public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
         {
             if (TransformationHandler.IsTransformed(drawInfo.drawPlayer))
