@@ -99,15 +99,15 @@ namespace DBZGoatLib.Model
 
             modPlayer.AddKi(drain * -1f, false, true);
 
-            player.moveSpeed *= Math.Max(1f, speedMulti * modPlayer.bonusSpeedMultiplier);
-            player.maxRunSpeed *= Math.Max(1f, speedMulti * modPlayer.bonusSpeedMultiplier);
-            player.runAcceleration *= Math.Max(1f, speedMulti * modPlayer.bonusSpeedMultiplier);
+            player.moveSpeed *= 1f + (speedMulti -1f) * modPlayer.bonusSpeedMultiplier;
+            player.maxRunSpeed *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
+            player.runAcceleration *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
             if (player.jumpSpeedBoost < 1f)
             {
                 player.jumpSpeedBoost = 1f;
             }
 
-            player.jumpSpeedBoost *= Math.Max(1f, speedMulti * modPlayer.bonusSpeedMultiplier);
+            player.jumpSpeedBoost *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
             player.GetDamage(DamageClass.Generic) += damageMulti;
 
 
