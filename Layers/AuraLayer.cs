@@ -34,12 +34,16 @@ namespace DBZGoatLib.Layers
 
             if (TransformationHandler.IsTransformed(drawInfo.drawPlayer))
             {
-                var data = TransformationHandler.GetCurrentTransformation(drawInfo.drawPlayer).Value.animationData;
 
-                if (data.Aura.Equals(new AuraData()))
-                    return;
-                DrawAura(modPlayer, data.Aura);
-                Lighting.AddLight(drawInfo.drawPlayer.Center + drawInfo.drawPlayer.velocity * 8f, data.Aura.Color.R / 100, data.Aura.Color.G / 100, data.Aura.Color.B / 100);
+                var forms = TransformationHandler.GetAllCurrentForms(drawInfo.drawPlayer);
+                
+                foreach(var data in forms.Select(x=>x.animationData))
+                {
+                    if (data.Aura.Equals(new AuraData()))
+                        return;
+                    DrawAura(modPlayer, data.Aura);
+                    Lighting.AddLight(drawInfo.drawPlayer.Center + drawInfo.drawPlayer.velocity * 8f, data.Aura.Color.R / 100, data.Aura.Color.G / 100, data.Aura.Color.B / 100);
+                }
             }
         }
 

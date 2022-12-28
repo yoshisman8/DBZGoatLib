@@ -16,21 +16,25 @@ namespace DBZGoatLib.Model
 
         public readonly AuraData Aura;
         public readonly bool Sparks;
+        public readonly string HairPath;
         public readonly SoundData Sound;
 
         public AnimationData(
             AuraData _auraData,
             bool _sparks,
-            SoundData _soundData)
+            SoundData _soundData,
+            string _HairPath)
         {
             Sparks = _sparks;
             Sound = _soundData;
             Aura = _auraData;
+            HairPath = _HairPath;
         }
 
         public static bool operator ==(AnimationData a1, AnimationData a2)
         {
             return a1.Sparks == a2.Sparks &&
+                a1.HairPath == a2.HairPath &&
                 a1.Sound == a2.Sound &&
                 a1.Aura == a2.Aura;
         }
@@ -38,6 +42,7 @@ namespace DBZGoatLib.Model
         public static bool operator !=(AnimationData a1, AnimationData a2)
         {
             return !(a1.Sparks == a2.Sparks &&
+                a1.HairPath == a2.HairPath &&
                 a1.Sound == a2.Sound &&
                 a1.Aura == a2.Aura);
         }
@@ -49,13 +54,14 @@ namespace DBZGoatLib.Model
             var a1 = (AnimationData) obj;
 
             return a1.Sparks == Sparks &&
+                a1.HairPath == HairPath &&
                 a1.Sound == Sound &&
                 a1.Aura == Aura;
         }
 
         public override int GetHashCode()
         {
-            return (Aura.GetHashCode() + Sound.GetHashCode() + Sparks.ToString()).GetHashCode();
+            return (Aura.GetHashCode() + HairPath.GetHashCode() + Sound.GetHashCode() + Sparks.ToString()).GetHashCode();
         }
     }
 
@@ -63,34 +69,27 @@ namespace DBZGoatLib.Model
     {
         public readonly string AuraPath;
         public readonly int Frames;
-        public readonly int FrameTimerLimit;
         public readonly BlendState BlendState;
         public readonly Color Color;
-        public readonly string HairPath;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="_Path">Path to the aura visuals. Leave empty to use generic aura.</param>
-        /// <param name="_Frames"></param>
-        /// <param name="_FrameTimerLimit"></param>
+        /// <param name="_Frames">The number of frames this aura has.</param>
         /// <param name="_blendState">If using generic aura, set to AlphaBlend.</param>
         /// <param name="_Color">If not using generic aura, set to White.</param>
         /// <param name="_HairPath">Leave blank if not you do not wish to replace the head texture.</param>
         public AuraData(
             string _Path,
             int _Frames,
-            int _FrameTimerLimit,
             BlendState _blendState,
-            Color _Color,
-            string _HairPath)
+            Color _Color)
         {
             AuraPath = _Path;
             Frames = _Frames;
-            FrameTimerLimit = _FrameTimerLimit;
             BlendState = _blendState;
             Color = _Color;
-            HairPath = _HairPath;
         }
 
         public Texture2D GetTexture() => ModContent.Request<Texture2D>(string.IsNullOrEmpty(AuraPath) ? "DBZGoatLib/Assets/BaseAura" : AuraPath, AssetRequestMode.AsyncLoad).Value;
@@ -137,18 +136,14 @@ namespace DBZGoatLib.Model
         {
             return a1.AuraPath == a2.AuraPath &&
                 a1.Frames == a2.Frames &&
-                a1.FrameTimerLimit == a2.FrameTimerLimit &&
-                a1.BlendState == a2.BlendState &&
-                a1.HairPath == a2.HairPath;
+                a1.BlendState == a2.BlendState;
         }
 
         public static bool operator !=(AuraData a1, AuraData a2)
         {
             return !(a1.AuraPath == a2.AuraPath &&
                 a1.Frames == a2.Frames &&
-                a1.FrameTimerLimit == a2.FrameTimerLimit &&
-                a1.BlendState == a2.BlendState &&
-                a1.HairPath == a2.HairPath);
+                a1.BlendState == a2.BlendState);
         }
 
         public override bool Equals(object obj)
@@ -159,14 +154,12 @@ namespace DBZGoatLib.Model
 
             return a1.AuraPath == AuraPath &&
                 a1.Frames == Frames &&
-                a1.FrameTimerLimit == FrameTimerLimit &&
-                a1.BlendState == BlendState &&
-                a1.HairPath == HairPath;
+                a1.BlendState == BlendState;
         }
 
         public override int GetHashCode()
         {
-            return (AuraPath + Frames.ToString() + FrameTimerLimit.ToString() + BlendState.GetHashCode() + HairPath).GetHashCode();
+            return (AuraPath + Frames.ToString() + BlendState.GetHashCode()).GetHashCode();
         }
     }
     

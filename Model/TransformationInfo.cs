@@ -12,6 +12,7 @@ namespace DBZGoatLib.Model
     {
         public readonly string buffKeyName;
         public readonly int buffID;
+        public readonly bool stackable;
         public readonly string transformationText;
         public readonly Color tranformtionColor;
         public readonly Predicate<Player> condition;
@@ -24,6 +25,7 @@ namespace DBZGoatLib.Model
         /// </summary>
         /// <param name="_buffId">The Buff ID of the transformation.</param>
         /// <param name="_buffKeyName">The name of the Buff Class.</param>
+        /// <param name="_stackable">Whether this form is stackable with other forms or not.</param>
         /// <param name="_transformationText">Text to be displayed when transforming.</param>
         /// <param name="_TransformationColor">Color to use for the Transformation Text.</param>
         /// <param name="_condition">Function which takes in a Player record and returns true or false to determine whether the user can entre that transformation.</param>
@@ -32,6 +34,7 @@ namespace DBZGoatLib.Model
         public TransformationInfo(
             int _buffId,
             string _buffKeyName,
+            bool _stackable,
             string _transformationText,
             Color _TransformationColor,
             Predicate<Player>_condition,
@@ -47,6 +50,7 @@ namespace DBZGoatLib.Model
             onTransform = _onTransform;
             postTransform = _postTransform;
             animationData = _animationData;
+            stackable = _stackable;
         }
     }
 }

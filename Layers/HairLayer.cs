@@ -33,7 +33,7 @@ namespace DBZGoatLib.Layers
 
                 var data = TransformationHandler.GetCurrentTransformation(drawInfo.drawPlayer).Value.animationData;
 
-                if (string.IsNullOrEmpty(data.Aura.HairPath))
+                if (string.IsNullOrEmpty(data.HairPath))
                     return;
 
                 Player drawPlayer = drawInfo.drawPlayer;
@@ -45,7 +45,7 @@ namespace DBZGoatLib.Layers
                 vector -= CalcRotation(drawPlayer.headRotation);
 
                 DrawData drawData = new DrawData(
-                    ModContent.Request<Texture2D>(data.Aura.HairPath, AssetRequestMode.AsyncLoad).Value,
+                    ModContent.Request<Texture2D>(data.HairPath, AssetRequestMode.AsyncLoad).Value,
                     vector,
                     new Rectangle?(drawPlayer.bodyFrame),
                     Color.White,

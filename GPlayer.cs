@@ -152,6 +152,8 @@ namespace DBZGoatLib
         {
             if (data.Equals(new AnimationData()))
                 return;
+            if (data.Sound.Equals(new SoundData()))
+                return;
             if (string.IsNullOrEmpty(data.Sound.StartAudioPath))
                 return;
             SoundHandler.PlaySound(data.Sound.StartAudioPath, Player, 0.7f, 0.1f);
@@ -164,7 +166,7 @@ namespace DBZGoatLib
             if (modPlayer.isCharging)
                 ++this.auraFrameTimer;
             ++this.auraFrameTimer;
-            if (this.auraFrameTimer >= aura.FrameTimerLimit)
+            if (this.auraFrameTimer >= 3)
             {
                 this.auraFrameTimer = 0;
                 ++this.auraCurrentFrame;

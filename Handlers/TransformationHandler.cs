@@ -178,15 +178,44 @@ namespace DBZGoatLib.Handlers
 
         /// <summary>
         /// Gets the current transformation the player has. Returns null if none is found.
+        /// DOES NOT CHECK FOR STACKABLE FORMS.
         /// </summary>
         public static TransformationInfo? GetCurrentTransformation(Player player)
         {
-            foreach (var transformation in Transformations)
+            foreach (var transformation in Transformations.Where(x=>!x.stackable))
             {
                 if (player.HasBuff(transformation.buffID))
                     return transformation;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Gets the current STACKABLE transformation the player has. Returns null if none is found
+        /// </summary>
+        public static TransformationInfo? GetCurrentStackedTransformation(Player player)
+        {
+            foreach (var transformation in Transformations.Where(x => x.stackable))
+            {
+                if (player.HasBuff(transformation.buffID))
+                    return transformation;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets ALL current transformations the player has, including stacked ones. Returns an empty array if the user is not transformed.
+        /// </summary>
+        public static TransformationInfo[] GetAllCurrentForms(Player player)
+        {
+            List<TransformationInfo> list = new();
+
+            foreach (var transformation in Transformations)
+            {
+                if (player.HasBuff(transformation.buffID))
+                    list.Add(transformation);
+            }
+            return list.ToArray();
         }
 
         /// <summary>
