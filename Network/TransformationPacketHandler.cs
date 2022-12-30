@@ -24,7 +24,7 @@ namespace DBZGoatLib.Network
             switch (reader.ReadByte())
             {
                 case SYNC_TRANFORMATIONS:
-
+                    ReceiveFormChanges(reader, fromWho);
                     break;
             }
         }
