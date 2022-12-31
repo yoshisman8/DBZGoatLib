@@ -80,7 +80,7 @@ namespace DBZGoatLib {
 
         public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo) {
             if (TransformationHandler.IsTransformed(drawInfo.drawPlayer)) {
-                var pClass = DBZGoatLib.DBZMOD.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+                var pClass = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
                 var modPlayer = pClass.GetMethod("ModPlayer").Invoke(null, new object[] { drawInfo.drawPlayer });
 
                 pClass.GetField("isCharging").SetValue(modPlayer, false);
@@ -142,7 +142,7 @@ namespace DBZGoatLib {
         public void IncrementAuraFrameTimers(AuraData aura) {
             if (aura.Equals(new AuraData()))
                 return;
-            dynamic modPlayer = DBZGoatLib.DBZMOD.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { Player });
+            dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { Player });
             if (modPlayer.isCharging)
                 ++this.auraFrameTimer;
             ++this.auraFrameTimer;
@@ -195,7 +195,7 @@ namespace DBZGoatLib {
                     }
                     return;
                 } else {
-                    var myPlayer = DBZGoatLib.DBZMOD.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+                    var myPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
                     var instance = myPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
                     bool prodigy = (bool)myPlayer.GetMethod("IsProdigy").Invoke(instance, null);
                     Masteries[transformation.buffID] = Math.Min(1f, value + (0.00232f * (prodigy ? 2f : 1f)));

@@ -74,11 +74,11 @@ namespace DBZGoatLib.Model {
         public override void Update(Player player, ref int buffIndex) {
             mastery = (int)(GPlayer.ModPlayer(player).GetMastery(Type) * 100f);
 
-            var MyPlayer = DBZGoatLib.DBZMOD.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+            var MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
 
             dynamic modPlayer = MyPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { player });
-            var KiDamage = DBZGoatLib.DBZMOD.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetField("KiDamage");
-            var KiDrainRate = DBZGoatLib.DBZMOD.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetField("kiDrainMulti");
+            var KiDamage = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetField("KiDamage");
+            var KiDrainRate = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetField("kiDrainMulti");
 
             if (modPlayer.IsKiDepleted() || (TransformationHandler.IsAnythingBut(player, Type, true) && !Stackable)) {
                 TransformationHandler.ClearTransformations(player);

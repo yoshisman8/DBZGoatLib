@@ -98,7 +98,7 @@ namespace DBZGoatLib.Handlers {
         /// End all transformations, including DBT's
         /// </summary>
         public static void ClearTransformations(Player player) {
-            var helper = DBZGoatLib.DBZMOD.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
+            var helper = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
 
             helper.GetMethod("EndTransformations").Invoke(null, new object[] { player });
 
@@ -146,14 +146,14 @@ namespace DBZGoatLib.Handlers {
             if (!IgnoreDBTtransformations) {
                 if (ModLoader.HasMod("DBZMODPORT")) {
                     foreach (var ext in DBTForms) {
-                        if (player.HasBuff(DBZGoatLib.DBZMOD.Find<ModBuff>(ext).Type))
+                        if (player.HasBuff(DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(ext).Type))
                             return true;
                     }
                 }
 
                 if (ModLoader.HasMod("dbzcalamity")) {
                     foreach (var ext in DBCAForms) {
-                        if (player.HasBuff(DBZGoatLib.DBCAMOD.Find<ModBuff>(ext).Type))
+                        if (player.HasBuff(DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type))
                             return true;
                     }
                 }
@@ -209,14 +209,14 @@ namespace DBZGoatLib.Handlers {
 
             if (ModLoader.HasMod("DBZMODPORT") && includeExternal) {
                 foreach (var ext in DBTForms) {
-                    if (player.HasBuff(DBZGoatLib.DBZMOD.Find<ModBuff>(ext).Type))
+                    if (player.HasBuff(DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(ext).Type))
                         return true;
                 }
             }
 
             if (ModLoader.HasMod("dbzcalamity") && includeExternal) {
                 foreach (var ext in DBCAForms) {
-                    if (player.HasBuff(DBZGoatLib.DBCAMOD.Find<ModBuff>(ext).Type))
+                    if (player.HasBuff(DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type))
                         return true;
                 }
             }

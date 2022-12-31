@@ -98,7 +98,7 @@ namespace DBZGoatLib.Model {
             float num1;
             Vector2 vector2;
 
-            dynamic DBZModPlayer = DBZGoatLib.DBZMOD.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { modPlayer.Player });
+            dynamic DBZModPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { modPlayer.Player });
 
             if (DBZModPlayer.isFlying) {
                 int num2 = (int)Math.Floor((double)(modPlayer.Player).height * 0.75);
