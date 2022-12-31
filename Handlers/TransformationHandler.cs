@@ -207,14 +207,16 @@ namespace DBZGoatLib.Handlers {
 
             if (ModLoader.HasMod("DBZMODPORT") && includeExternal) {
                 foreach (var ext in DBTForms) {
-                    if (player.HasBuff(DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(ext).Type))
+                    int extType = DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(ext).Type;
+                    if (player.HasBuff(extType) && extType != buffId)
                         return true;
                 }
             }
 
             if (ModLoader.HasMod("dbzcalamity") && includeExternal) {
                 foreach (var ext in DBCAForms) {
-                    if (player.HasBuff(DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type))
+                    int extType = DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type;
+                    if (player.HasBuff(extType) && extType != buffId)
                         return true;
                 }
             }
