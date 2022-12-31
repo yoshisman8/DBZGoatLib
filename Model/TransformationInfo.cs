@@ -47,5 +47,20 @@ namespace DBZGoatLib.Model {
             animationData = _animationData;
             stackable = _stackable;
         }
+
+        [Obsolete("Please use TransformationInfo(int, string, bool, string, Color, Predicate<Player>, Action<Player>, Action<Player>, AnimationData")]
+        public TransformationInfo(int _buffId, string _buffKeyName,
+            string _transformationText, Color _TransformationColor, Predicate<Player> _condition,
+            Action<Player> _onTransform, Action<Player> _postTransform, AnimationData _animationData) {
+            buffID = _buffId;
+            transformationText = _transformationText;
+            tranformtionColor = _TransformationColor;
+            buffKeyName = _buffKeyName;
+            condition = _condition;
+            onTransform = _onTransform;
+            postTransform = _postTransform;
+            animationData = _animationData;
+            stackable = false;
+        }
     }
 }

@@ -27,6 +27,14 @@ namespace DBZGoatLib.Model {
             HairPath = _HairPath;
         }
 
+        [Obsolete("Please use AnimationData(AuraData, bool, SoundData, string)")]
+        public AnimationData(AuraData _auraData, bool _sparks, SoundData _soundData) {
+            Sparks = _sparks;
+            Sound = _soundData;
+            Aura = _auraData;
+            HairPath = string.Empty;
+        }
+
         public static bool operator ==(AnimationData a1, AnimationData a2) {
             return a1.Sparks == a2.Sparks &&
                 a1.HairPath == a2.HairPath &&
@@ -82,41 +90,48 @@ namespace DBZGoatLib.Model {
             Color = _Color;
         }
 
+        [Obsolete("Please use AuraData(string, int, BlendState, Color)")]
+        public AuraData(string _Path, int _Frames, int _FrameTimerLimit, BlendState _blendState, Color _Color, string _HairPath) {
+            AuraPath = _Path;
+            Frames = _Frames;
+            BlendState = _blendState;
+            Color = _Color;
+        }
+
         public Texture2D GetTexture() => ModContent.Request<Texture2D>(string.IsNullOrEmpty(AuraPath) ? "DBZGoatLib/Assets/BaseAura" : AuraPath, AssetRequestMode.AsyncLoad).Value;
 
         public int GetHeight() => GetTexture().Height / Frames;
 
         public int GetWidth() => GetTexture().Width;
 
-        public int GetAuraOffsetY(GPlayer modPlayer) => (int)(0.0 - ((double)(this.GetHeight() / 2) * 1f - (double)modPlayer.Player.height * 0.600000023841858));
+        public int GetAuraOffsetY(GPlayer modPlayer) => (int)(0.0 - ((double)(GetHeight() / 2) * 1f - modPlayer.Player.height * 0.600000023841858));
 
         public Tuple<float, Vector2> GetAuraRotationAndPosition(GPlayer modPlayer) {
             bool flag = (double)Math.Abs(modPlayer.Player.velocity.X) <= 6.0 && (double)Math.Abs(modPlayer.Player.velocity.Y) <= 6.0;
             Vector2 zero = Vector2.Zero;
-            double auraScale = 1f;
-            int auraOffsetY = this.GetAuraOffsetY(modPlayer);
+            int auraOffsetY = GetAuraOffsetY(modPlayer);
             float num1;
             Vector2 vector2;
 
             dynamic DBZModPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { modPlayer.Player });
 
             if (DBZModPlayer.isFlying) {
-                int num2 = (int)Math.Floor((double)(modPlayer.Player).height * 0.75);
-                double num3 = (double)modPlayer.Player.fullRotation <= 0.0 ? 3.14159274101257 : -3.14159274101257;
+                int num2 = (int)Math.Floor((modPlayer.Player).height * 0.75);
+                double num3 = modPlayer.Player.fullRotation <= 0.0 ? 3.14159274101257 : -3.14159274101257;
                 num1 = modPlayer.Player.fullRotation + (float)num3;
-                double num4 = (double)(modPlayer.Player.width / 4);
-                double num5 = (double)(modPlayer.Player.height / 4);
-                double num6 = (double)(this.GetWidth() / 4);
-                double num7 = (double)(this.GetHeight() / 4);
-                double num8 = num4 + (double)auraOffsetY + (double)num2;
+                double num4 = modPlayer.Player.width / 4;
+                double num5 = modPlayer.Player.height / 4;
+                double num6 = GetWidth() / 4;
+                double num7 = GetHeight() / 4;
+                double num8 = num4 + auraOffsetY + num2;
                 double num9 = num6 - num8;
-                double num10 = num7 - (num5 + (double)auraOffsetY + (double)num2);
-                double num11 = num9 * Math.Cos((double)modPlayer.Player.fullRotation);
-                double num12 = Math.Sin((double)modPlayer.Player.fullRotation);
+                double num10 = num7 - (num5 + auraOffsetY + num2);
+                double num11 = num9 * Math.Cos(modPlayer.Player.fullRotation);
+                double num12 = Math.Sin(modPlayer.Player.fullRotation);
                 double num13 = num10 * num12;
                 vector2 = modPlayer.Player.Center + new Vector2((float)(0.0 - num13), (float)num11);
             } else {
-                vector2 = modPlayer.Player.Center + new Vector2(0.0f, (float)auraOffsetY);
+                vector2 = modPlayer.Player.Center + new Vector2(0.0f, auraOffsetY);
                 num1 = 0.0f;
             }
             return new Tuple<float, Vector2>(num1, vector2);
