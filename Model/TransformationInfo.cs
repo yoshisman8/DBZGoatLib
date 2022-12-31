@@ -1,15 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+
+using Microsoft.Xna.Framework;
+
 using Terraria;
 
-namespace DBZGoatLib.Model
-{
-    public readonly record struct TransformationInfo
-    {
+namespace DBZGoatLib.Model {
+    public readonly record struct TransformationInfo {
         public readonly string buffKeyName;
         public readonly int buffID;
         public readonly bool stackable;
@@ -37,11 +33,10 @@ namespace DBZGoatLib.Model
             bool _stackable,
             string _transformationText,
             Color _TransformationColor,
-            Predicate<Player>_condition,
+            Predicate<Player> _condition,
             Action<Player> _onTransform,
             Action<Player> _postTransform,
-            AnimationData _animationData)
-        {
+            AnimationData _animationData) {
             buffID = _buffId;
             transformationText = _transformationText;
             tranformtionColor = _TransformationColor;

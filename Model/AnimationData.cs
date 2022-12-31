@@ -1,19 +1,16 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+using ReLogic.Content;
+
 using Terraria.ModLoader;
 
-namespace DBZGoatLib.Model
-{
-    public readonly struct AnimationData
-    {
+namespace DBZGoatLib.Model {
 
+    public readonly struct AnimationData {
         public readonly AuraData Aura;
         public readonly bool Sparks;
         public readonly string HairPath;
@@ -23,35 +20,31 @@ namespace DBZGoatLib.Model
             AuraData _auraData,
             bool _sparks,
             SoundData _soundData,
-            string _HairPath)
-        {
+            string _HairPath) {
             Sparks = _sparks;
             Sound = _soundData;
             Aura = _auraData;
             HairPath = _HairPath;
         }
 
-        public static bool operator ==(AnimationData a1, AnimationData a2)
-        {
+        public static bool operator ==(AnimationData a1, AnimationData a2) {
             return a1.Sparks == a2.Sparks &&
                 a1.HairPath == a2.HairPath &&
                 a1.Sound == a2.Sound &&
                 a1.Aura == a2.Aura;
         }
 
-        public static bool operator !=(AnimationData a1, AnimationData a2)
-        {
+        public static bool operator !=(AnimationData a1, AnimationData a2) {
             return !(a1.Sparks == a2.Sparks &&
                 a1.HairPath == a2.HairPath &&
                 a1.Sound == a2.Sound &&
                 a1.Aura == a2.Aura);
         }
 
-        public override bool Equals(object obj)
-        {
+        public override bool Equals(object obj) {
             if (obj is not AnimationData || obj == null) return false;
 
-            var a1 = (AnimationData) obj;
+            var a1 = (AnimationData)obj;
 
             return a1.Sparks == Sparks &&
                 a1.HairPath == HairPath &&
@@ -59,21 +52,19 @@ namespace DBZGoatLib.Model
                 a1.Aura == Aura;
         }
 
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             return (Aura.GetHashCode() + HairPath.GetHashCode() + Sound.GetHashCode() + Sparks.ToString()).GetHashCode();
         }
     }
 
-    public readonly struct AuraData
-    {
+    public readonly struct AuraData {
         public readonly string AuraPath;
         public readonly int Frames;
         public readonly BlendState BlendState;
         public readonly Color Color;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="_Path">Path to the aura visuals. Leave empty to use generic aura.</param>
         /// <param name="_Frames">The number of frames this aura has.</param>
@@ -84,8 +75,7 @@ namespace DBZGoatLib.Model
             string _Path,
             int _Frames,
             BlendState _blendState,
-            Color _Color)
-        {
+            Color _Color) {
             AuraPath = _Path;
             Frames = _Frames;
             BlendState = _blendState;
@@ -93,11 +83,14 @@ namespace DBZGoatLib.Model
         }
 
         public Texture2D GetTexture() => ModContent.Request<Texture2D>(string.IsNullOrEmpty(AuraPath) ? "DBZGoatLib/Assets/BaseAura" : AuraPath, AssetRequestMode.AsyncLoad).Value;
+
         public int GetHeight() => GetTexture().Height / Frames;
+
         public int GetWidth() => GetTexture().Width;
+
         public int GetAuraOffsetY(GPlayer modPlayer) => (int)(0.0 - ((double)(this.GetHeight() / 2) * 1f - (double)modPlayer.Player.height * 0.600000023841858));
-        public Tuple<float, Vector2> GetAuraRotationAndPosition(GPlayer modPlayer)
-        {
+
+        public Tuple<float, Vector2> GetAuraRotationAndPosition(GPlayer modPlayer) {
             bool flag = (double)Math.Abs(modPlayer.Player.velocity.X) <= 6.0 && (double)Math.Abs(modPlayer.Player.velocity.Y) <= 6.0;
             Vector2 zero = Vector2.Zero;
             double auraScale = 1f;
@@ -107,8 +100,7 @@ namespace DBZGoatLib.Model
 
             dynamic DBZModPlayer = DBZGoatLib.DBZMOD.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { modPlayer.Player });
 
-            if (DBZModPlayer.isFlying)
-            {
+            if (DBZModPlayer.isFlying) {
                 int num2 = (int)Math.Floor((double)(modPlayer.Player).height * 0.75);
                 double num3 = (double)modPlayer.Player.fullRotation <= 0.0 ? 3.14159274101257 : -3.14159274101257;
                 num1 = modPlayer.Player.fullRotation + (float)num3;
@@ -123,31 +115,26 @@ namespace DBZGoatLib.Model
                 double num12 = Math.Sin((double)modPlayer.Player.fullRotation);
                 double num13 = num10 * num12;
                 vector2 = modPlayer.Player.Center + new Vector2((float)(0.0 - num13), (float)num11);
-            }
-            else
-            {
+            } else {
                 vector2 = modPlayer.Player.Center + new Vector2(0.0f, (float)auraOffsetY);
                 num1 = 0.0f;
             }
             return new Tuple<float, Vector2>(num1, vector2);
         }
 
-        public static bool operator ==(AuraData a1, AuraData a2)
-        {
+        public static bool operator ==(AuraData a1, AuraData a2) {
             return a1.AuraPath == a2.AuraPath &&
                 a1.Frames == a2.Frames &&
                 a1.BlendState == a2.BlendState;
         }
 
-        public static bool operator !=(AuraData a1, AuraData a2)
-        {
+        public static bool operator !=(AuraData a1, AuraData a2) {
             return !(a1.AuraPath == a2.AuraPath &&
                 a1.Frames == a2.Frames &&
                 a1.BlendState == a2.BlendState);
         }
 
-        public override bool Equals(object obj)
-        {
+        public override bool Equals(object obj) {
             if (obj is not AuraData || obj == null) return false;
 
             var a1 = (AuraData)obj;
@@ -157,14 +144,12 @@ namespace DBZGoatLib.Model
                 a1.BlendState == BlendState;
         }
 
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             return (AuraPath + Frames.ToString() + BlendState.GetHashCode()).GetHashCode();
         }
     }
-    
-    public readonly struct SoundData
-    {
+
+    public readonly struct SoundData {
         public readonly string StartAudioPath;
         public readonly string LoopAudioPath;
         public readonly int LoopSoundDuration;
@@ -172,29 +157,25 @@ namespace DBZGoatLib.Model
         public SoundData(
             string _StartAudioPath,
             string _LoopAudioPath,
-            int _LoopDuration)
-        {
+            int _LoopDuration) {
             StartAudioPath = _StartAudioPath;
             LoopAudioPath = _LoopAudioPath;
             LoopSoundDuration = _LoopDuration;
         }
 
-        public static bool operator ==(SoundData a1, SoundData a2)
-        {
+        public static bool operator ==(SoundData a1, SoundData a2) {
             return a1.StartAudioPath == a2.StartAudioPath &&
                 a1.LoopAudioPath == a2.LoopAudioPath &&
                 a1.LoopSoundDuration == a2.LoopSoundDuration;
         }
 
-        public static bool operator !=(SoundData a1, SoundData a2)
-        {
+        public static bool operator !=(SoundData a1, SoundData a2) {
             return !(a1.StartAudioPath == a2.StartAudioPath &&
                 a1.LoopAudioPath == a2.LoopAudioPath &&
                 a1.LoopSoundDuration == a2.LoopSoundDuration);
         }
 
-        public override bool Equals(object obj)
-        {
+        public override bool Equals(object obj) {
             if (obj is not SoundData || obj == null) return false;
 
             var a1 = (SoundData)obj;
@@ -204,8 +185,7 @@ namespace DBZGoatLib.Model
                 a1.LoopSoundDuration == LoopSoundDuration;
         }
 
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             return (StartAudioPath + LoopAudioPath + LoopSoundDuration.ToString()).GetHashCode();
         }
     }
