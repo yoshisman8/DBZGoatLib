@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using DBZGoatLib.Handlers;
@@ -21,8 +22,8 @@ namespace DBZGoatLib {
         public int lightning3FrameTime;
         public int lightning3FrameTimer = 6;
 
-        public Dictionary<int, float> Masteries = new Dictionary<int, float>();
-        public Dictionary<int, bool> MasteryMaxed = new Dictionary<int, bool>();
+        public readonly Dictionary<int, float> Masteries = new();
+        public readonly Dictionary<int, bool> MasteryMaxed = new();
 
         internal KeyValuePair<uint, ActiveSound> auraSoundInfo;
         internal int playerIndexWithLocalAudio;
@@ -74,9 +75,7 @@ namespace DBZGoatLib {
             }
         }
 
-        public override void PlayerDisconnect(Player player) {
-            TransformationHandler.ClearTransformations(player);
-        }
+        public override void PlayerDisconnect(Player player) => TransformationHandler.ClearTransformations(player);
 
         public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo) {
             if (TransformationHandler.IsTransformed(drawInfo.drawPlayer)) {
@@ -93,7 +92,7 @@ namespace DBZGoatLib {
 
                 if (!currentAnimation.Equals(previousAnimation)) {
                     auraSoundInfo = SoundHandler.KillTrackedSound(auraSoundInfo);
-                    HandleAuraStartupSound(currentAnimation, false);
+                    HandleAuraStartupSound(currentAnimation);
                     auraSoundtimer = 0;
                     auraFrameTimer = 0;
                 }
@@ -109,8 +108,8 @@ namespace DBZGoatLib {
         public static GPlayer ModPlayer(Player player) => player.GetModPlayer<GPlayer>();
 
         public float GetMastery(int BuffId) {
-            if (Masteries.ContainsKey(BuffId))
-                return Masteries[BuffId];
+            if (Masteries.TryGetValue(BuffId, out var mastery))
+                return mastery;
             else return 0f;
         }
 
@@ -129,7 +128,7 @@ namespace DBZGoatLib {
             SoundHandler.UpdateTrackedSound(auraSoundInfo, Player.position);
         }
 
-        public void HandleAuraStartupSound(AnimationData data, bool isCharging) {
+        public void HandleAuraStartupSound(AnimationData data) {
             if (data.Equals(new AnimationData()))
                 return;
             if (data.Sound.Equals(new SoundData()))
@@ -144,15 +143,15 @@ namespace DBZGoatLib {
                 return;
             dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { Player });
             if (modPlayer.isCharging)
-                ++this.auraFrameTimer;
-            ++this.auraFrameTimer;
-            if (this.auraFrameTimer >= 3) {
-                this.auraFrameTimer = 0;
-                ++this.auraCurrentFrame;
+                ++auraFrameTimer;
+            ++auraFrameTimer;
+            if (auraFrameTimer >= 3) {
+                auraFrameTimer = 0;
+                ++auraCurrentFrame;
             }
-            if (this.auraCurrentFrame < aura.Frames)
+            if (auraCurrentFrame < aura.Frames)
                 return;
-            this.auraCurrentFrame = 0;
+            auraCurrentFrame = 0;
         }
 
         public override void PostUpdate() {

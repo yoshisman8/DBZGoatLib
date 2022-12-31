@@ -24,7 +24,6 @@ namespace DBZGoatLib.Layers {
         protected override void Draw(ref PlayerDrawSet drawInfo) {
             if (Main.netMode == NetmodeID.Server)
                 return;
-            GPlayer modPlayer = drawInfo.drawPlayer.GetModPlayer<GPlayer>();
 
             if (TransformationHandler.IsTransformed(drawInfo.drawPlayer)) {
                 var data = TransformationHandler.GetCurrentTransformation(drawInfo.drawPlayer).Value.animationData;
@@ -55,10 +54,10 @@ namespace DBZGoatLib.Layers {
             }
         }
 
-        private Vector2 CalcRotation(float rot) {
+        private static Vector2 CalcRotation(float rot) {
             Vector2 vector = new Vector2(-13f - rot * 4.25f, -13f + rot * 4.25f);
-            float num = (float)Math.Sqrt(Math.Pow((double)vector.X, 2.0) + Math.Pow((double)vector.Y, 2.0));
-            float num2 = (float)Math.Sqrt(Math.Pow((double)vector.Y, 2.0) + Math.Pow((double)(vector.X + num), 2.0));
+            float num = (float)Math.Sqrt(Math.Pow(vector.X, 2.0) + Math.Pow(vector.Y, 2.0));
+            float num2 = (float)Math.Sqrt(Math.Pow(vector.Y, 2.0) + Math.Pow((double)(vector.X + num), 2.0));
             float num3 = (float)Math.Acos((Math.Pow((double)num, 2.0) + Math.Pow((double)num, 2.0) - Math.Pow((double)num2, 2.0)) / (2.0 * Math.Pow((double)num, 2.0)));
             float num4 = vector.X + num * (float)Math.Cos((double)(MathHelper.ToRadians(rot * 90f) + num3));
             float num5 = vector.Y + num * (float)Math.Sin((double)(MathHelper.ToRadians(rot * 90f) + num3));

@@ -12,8 +12,7 @@ namespace DBZGoatLib.Handlers {
 
     public sealed class TransformationHandler {
 
-        private static List<string> DBTForms => new List<string>
-        {
+        private static readonly List<string> DBTForms = new() {
             "SSJ1Buff",
             "ASSJBuff",
             "USSJBuff",
@@ -28,8 +27,7 @@ namespace DBZGoatLib.Handlers {
             "LSSJ3Buff"
         };
 
-        private static List<string> DBCAForms => new List<string>
-        {
+        private static readonly List<string> DBCAForms = new() {
             "UIBuff",
             "UISignBuff",
             "UEBuff"
@@ -38,17 +36,17 @@ namespace DBZGoatLib.Handlers {
         /// <summary>
         /// The Transform keybind registered by DBT.
         /// </summary>
-        public static ModKeybind TransformKey;
+        public static ModKeybind TransformKey = null!;
 
         /// <summary>
         /// The Power down keybind registered by DBT.
         /// </summary>
-        public static ModKeybind PowerDownKey;
+        public static ModKeybind PowerDownKey = null!;
 
         /// <summary>
         /// The Energy Charge keybind registered by DBT.
         /// </summary>
-        public static ModKeybind EnergyChargeKey;
+        public static ModKeybind EnergyChargeKey = null!;
 
         /// <summary>
         /// List of all Transformations. Can be added to.

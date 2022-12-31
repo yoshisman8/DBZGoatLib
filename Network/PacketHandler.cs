@@ -9,7 +9,7 @@ namespace DBZGoatLib.Network {
 
         public abstract void HandlePacket(BinaryReader reader, int fromWho);
 
-        protected PacketHandler(byte handlerType) => this.HandlerType = handlerType;
+        protected PacketHandler(byte handlerType) => HandlerType = handlerType;
 
         protected ModPacket GetPacket(byte packetType) {
             ModPacket packet;

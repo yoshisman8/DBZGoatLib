@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
 
@@ -11,11 +12,12 @@ namespace DBZGoatLib.Handlers {
 
     public static class SoundHandler {
 
-        public static uint invalidSlot {
-            get {
-                return (uint)SlotId.Invalid.ToFloat();
-            }
-        }
+        public static uint InvalidSlot => (uint)SlotId.Invalid.ToFloat();
+
+        [Obsolete("Please use InvalidSlot")]
+#pragma warning disable IDE1006
+        public static uint invalidSlot => InvalidSlot;
+#pragma warning restore IDE1006
 
         public static KeyValuePair<uint, ActiveSound> PlaySound(
             string soundId,
@@ -32,18 +34,15 @@ namespace DBZGoatLib.Handlers {
             float volume = 1f,
             float pitchVariance = 0.0f) {
             if (Main.dedServ)
-                return new KeyValuePair<uint, ActiveSound>(invalidSlot, null);
-            SlotId invalid = SlotId.Invalid;
+                return new KeyValuePair<uint, ActiveSound>(InvalidSlot, null);
             SoundStyle customStyle = GetCustomStyle(soundId, volume, pitchVariance);
-            ActiveSound activeSound = (ActiveSound)null;
             SlotId slotId = !location.Equals(Vector2.Zero) ? SoundEngine.PlaySound(customStyle, new Vector2?(location)) : SoundEngine.PlaySound(customStyle, new Vector2?());
-            SoundEngine.TryGetActiveSound(slotId, out activeSound);
+            SoundEngine.TryGetActiveSound(slotId, out var activeSound);
             return new KeyValuePair<uint, ActiveSound>(slotId.Value, activeSound);
         }
 
         public static void PlaySound(SlotId slotId) {
-            ActiveSound activeSound;
-            SoundEngine.TryGetActiveSound(slotId, out activeSound);
+            SoundEngine.TryGetActiveSound(slotId, out var activeSound);
             if (activeSound.IsPlaying)
                 return;
             activeSound.Resume();
@@ -53,9 +52,10 @@ namespace DBZGoatLib.Handlers {
             string soundId,
             float volume = 1f,
             float pitchVariance = 0.0f) {
-            SoundStyle customStyle = new SoundStyle(soundId, (SoundType)0);
-            customStyle.Volume = volume;
-            customStyle.PitchVariance = pitchVariance;
+            SoundStyle customStyle = new SoundStyle(soundId, (SoundType)0) {
+                Volume = volume,
+                PitchVariance = pitchVariance
+            };
             return customStyle;
         }
 
@@ -66,13 +66,13 @@ namespace DBZGoatLib.Handlers {
                 activeSound.Stop();
             else
                 soundInfo.Value?.Stop();
-            return new KeyValuePair<uint, ActiveSound>(invalidSlot, (ActiveSound)null);
+            return new KeyValuePair<uint, ActiveSound>(InvalidSlot, null);
         }
 
         public static void KillOtherPlayerAudio(Player myPlayer) {
             for (int index = 0; index < Main.player.Length; ++index) {
                 Player player = Main.player[index];
-                if (((Entity)player).whoAmI == index && ((Entity)player).whoAmI != Main.myPlayer) {
+                if (player.whoAmI == index && player.whoAmI != Main.myPlayer) {
                     GPlayer modPlayer = player.GetModPlayer<GPlayer>();
                     modPlayer.auraSoundInfo = KillTrackedSound(modPlayer.auraSoundInfo);
                 }
@@ -93,7 +93,7 @@ namespace DBZGoatLib.Handlers {
                 GPlayer modPlayer2 = Main.LocalPlayer.GetModPlayer<GPlayer>();
                 flag = modPlayer2.auraSoundInfo.Value == null && CanPlayOtherPlayerAudio(modPlayer2, player);
                 if (flag)
-                    modPlayer2.playerIndexWithLocalAudio = ((Entity)player).whoAmI;
+                    modPlayer2.playerIndexWithLocalAudio = player.whoAmI;
             }
             return flag;
         }
