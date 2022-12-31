@@ -40,25 +40,21 @@ namespace DBZGoatLib.Model {
 
         public string BuildTooltip() {
             if (tipMastery != mastery || tipMastery == 0) {
-                int percent1 = (int)Math.Round(damageMulti * 100f, 0);
-                int percent2 = (int)Math.Round((speedMulti - 1f) * 100f, 0);
+                var speed = speedMulti - 1f;
 
                 float num1 = 60f * kiDrainRate;
                 float num2 = 60f * kiDrainRateWithMastery;
 
-                int percent3 = (int)Math.Round(attackDrainMulti * 100.0, 0) - 100;
-
                 StringBuilder sb = new StringBuilder();
 
-                if (percent1 != 0)
-                    sb.Append($"Damage {(percent1 > 0 ? '+' : '-')}{percent1}% ");
-                if (percent2 != 0)
-                    sb.AppendLine($"Speed {(percent2 > 0 ? '+' : '-')}{percent2}%");
+                if (damageMulti != 0f)
+                    sb.Append($"Damage {(damageMulti > 0 ? '+' : '-')}{damageMulti:P2} ");
+                if (speed != 0f)
+                    sb.AppendLine($"Speed {(speed > 0 ? '+' : '-')}{speed:P2}");
+                if (attackDrainMulti != 0f)
+                    sb.AppendLine($"Ki Costs {(attackDrainMulti > 0 ? '+' : '-')}{attackDrainMulti:P2}");
 
-                if (percent3 != 0)
-                    sb.AppendLine($"Ki Costs {(percent3 > 0 ? '+' : '-')}{percent3}");
-
-                sb.AppendLine($"Ki Drain {(int)num1}/s, {(int)num2}/s when mastered");
+                sb.AppendLine($"Ki Drain {MathF.Round(num1):N0}/s, {MathF.Round(num2):N0}/s when mastered");
 
                 sb.Append($"Mastery: {mastery}%");
 
