@@ -234,8 +234,7 @@ namespace DBZGoatLib.Handlers
             {
                 foreach(var ext in DBTForms)
                 {
-                    int extType = DBZGoatLib.DBZMOD.Find<ModBuff>(ext).Type;
-                    if (player.HasBuff(extType) && extType != buffId)
+                    if (player.HasBuff(DBZGoatLib.DBZMOD.Find<ModBuff>(ext).Type))
                         return true;
                 }
             }
@@ -244,8 +243,7 @@ namespace DBZGoatLib.Handlers
             {
                 foreach (var ext in DBCAForms)
                 {
-                    int extType = DBZGoatLib.DBCAMOD.Find<ModBuff>(ext).Type;
-                    if (player.HasBuff(extType) && extType != buffId)
+                    if (player.HasBuff(DBZGoatLib.DBCAMOD.Find<ModBuff>(ext).Type))
                         return true;
                 }
             }
