@@ -19,6 +19,26 @@ namespace DBZGoatLib.Handlers {
         public static uint invalidSlot => InvalidSlot;
 #pragma warning restore IDE1006
 
+        public static SlotId PlayVanillaSound(SoundStyle soundId, Player player = null, float volume = 1f, float pitchVariance = 0f)
+        {
+            Vector2 location = (player != null) ? player.Center : Vector2.Zero;
+            return PlayVanillaSound(soundId, location, volume, pitchVariance);
+        }
+
+        public static SlotId PlayVanillaSound(SoundStyle soundId, Vector2 location, float volume = 1f, float pitchVariance = 0f)
+        {
+            SoundStyle soundStyle = soundId;
+            soundStyle.Volume = volume;
+            soundStyle.PitchVariance = pitchVariance;
+            SoundStyle newsound = soundStyle;
+            if (Main.dedServ)
+            {
+                return SlotId.Invalid;
+            }
+
+            return SoundEngine.PlaySound(newsound, new Vector2?(location));
+        }
+
         public static KeyValuePair<uint, ActiveSound> PlaySound(
             string soundId,
             Player player = null,

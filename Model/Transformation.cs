@@ -17,10 +17,6 @@ namespace DBZGoatLib.Model {
         public float attackDrainMulti;
         public int baseDefenceBonus;
 
-        private int mastery = 0;
-        private int tipMastery = 0;
-        private string tipCache = "";
-
         /// <summary>
         /// This form can be stacked with other forms. Only do this if you you know how to balance it!
         /// </summary>
@@ -34,42 +30,27 @@ namespace DBZGoatLib.Model {
             Description.SetDefault(BuildTooltip());
         }
 
-        public override void ModifyBuffTip(ref string tip, ref int rare) {
-            tip = BuildTooltip();
-        }
-
         public string BuildTooltip() {
-            if (tipMastery != mastery || tipMastery == 0) {
-                var speed = speedMulti - 1f;
+            var speed = speedMulti - 1f;
 
-                float num1 = 60f * kiDrainRate;
-                float num2 = 60f * kiDrainRateWithMastery;
+            float num1 = 60f * kiDrainRate;
+            float num2 = 60f * kiDrainRateWithMastery;
 
-                StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
 
-                if (damageMulti != 0f)
-                    sb.Append($"Damage {(damageMulti > 0 ? '+' : '-')}{damageMulti:P2} ");
-                if (speed != 0f)
-                    sb.AppendLine($"Speed {(speed > 0 ? '+' : '-')}{speed:P2}");
-                if (attackDrainMulti != 0f)
-                    sb.AppendLine($"Ki Costs {(attackDrainMulti > 0 ? '+' : '-')}{attackDrainMulti:P2}");
+            if (damageMulti != 0f)
+                sb.Append($"Damage {(damageMulti > 0 ? '+' : '-')}{damageMulti:P2} ");
+            if (speed != 0f)
+                sb.AppendLine($"Speed {(speed > 0 ? '+' : '-')}{speed:P2}");
+            if (attackDrainMulti != 0f)
+                sb.AppendLine($"Ki Costs {(attackDrainMulti > 0 ? '+' : '-')}{attackDrainMulti:P2}");
 
-                sb.AppendLine($"Ki Drain {MathF.Round(num1):N0}/s, {MathF.Round(num2):N0}/s when mastered");
+            sb.AppendLine($"Ki Drain {MathF.Round(num1):N0}/s, {MathF.Round(num2):N0}/s when mastered");
 
-                sb.Append($"Mastery: {mastery}%");
-
-                tipCache = sb.ToString();
-                tipMastery = mastery;
-
-                return sb.ToString();
-            } else {
-                return tipCache;
-            }
+            return sb.ToString();
         }
 
         public override void Update(Player player, ref int buffIndex) {
-            mastery = (int)(GPlayer.ModPlayer(player).GetMastery(Type) * 100f);
-
             var MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
 
             dynamic modPlayer = MyPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { player });

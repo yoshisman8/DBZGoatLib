@@ -5,13 +5,16 @@ using System.Linq;
 
 using DBZGoatLib.Handlers;
 using DBZGoatLib.Model;
-
+using DBZGoatLib.UI;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.Utilities;
 
 namespace DBZGoatLib {
 
@@ -37,6 +40,9 @@ namespace DBZGoatLib {
         internal DateTime? LastHitEnemy;
         internal DateTime? LastHit;
 
+        public bool Traited;
+        public string Trait;
+
         public override void SaveData(TagCompound tag) {
             foreach (var trans in TransformationHandler.Transformations) {
                 if (Masteries.TryGetValue(trans.buffID, out float mastery) && !tag.ContainsKey($"DBZGoatLib_{trans.buffKeyName}")) {
@@ -46,6 +52,9 @@ namespace DBZGoatLib {
                     tag.Add($"DBZGoatLib_{trans.buffKeyName}_Maxed", maxed);
                 }
             }
+            tag.Add("DBZGoatLib_SelectedForm", TransformationMenu.ActiveForm);
+            tag.Add("DBZGoatLib_Trait", Trait);
+            tag.Add("DBZGoatLib_Traited", Traited);
         }
 
         public override void LoadData(TagCompound tag) {
@@ -61,8 +70,14 @@ namespace DBZGoatLib {
                     else MasteryMaxed[trans.buffID] = tag.GetBool($"DBZGoatLib_{trans.buffKeyName}_Maxed");
                 }
             }
-        }
+            if (tag.ContainsKey("DBZGoatLib_SelectedForm"))
+                TransformationMenu.ActiveForm = tag.GetString("DBZGoatLib_SelectedForm");
 
+            if (tag.ContainsKey("DBZGoatLib_Trait"))
+                Trait = tag.GetString("DBZGoatLib_Trait");
+            if (tag.ContainsKey("DBZGoatLib_Traited"))
+                Traited = tag.GetBool("DBZGoatLib_Traited");
+        }
         public override void OnEnterWorld(Player player) {
             if (player.whoAmI != Player.whoAmI)
                 return;
@@ -73,8 +88,57 @@ namespace DBZGoatLib {
                 if (!MasteryMaxed.ContainsKey(trans.buffID))
                     MasteryMaxed.Add(trans.buffID, false);
             }
-        }
 
+            if (!Traited)
+                RollTraits();
+            else
+            {
+                var traitInfo = TraitHandler.GetTraitByName(Trait);
+                if(traitInfo.HasValue)
+                    traitInfo.Value.IfTrait(Player,traitInfo.Value);
+            }
+        }
+        internal void ClearDBTTrait()
+        {
+            var MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+
+            var playerTrait = MyPlayer.GetField("playerTrait");
+
+            var modPlayer = MyPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
+
+            playerTrait.SetValue(modPlayer, "");
+        }
+        public void RollTraits()
+        {
+            ClearDBTTrait();
+
+            var rolled = TraitHandler.RollTrait();
+
+            Trait = rolled.Name;
+
+            rolled.IfTrait(Player, rolled);
+
+            Traited = true;
+
+            TransformationMenu.Dirty = true;
+        }
+        public void RerollTraits()
+        {
+            ClearDBTTrait();
+
+            var current = TraitHandler.GetTraitByName(Trait);
+
+            if (current.HasValue)
+                current.Value.IfUntrait(Player, current.Value);
+
+            var rolled = TraitHandler.RollTrait(false, Trait);
+
+            Trait = rolled.Name;
+
+            rolled.IfTrait(Player, rolled);
+
+            TransformationMenu.Dirty = true;
+        }
         public override void PlayerDisconnect(Player player) => TransformationHandler.ClearTransformations(player);
 
         public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo) {
@@ -107,12 +171,37 @@ namespace DBZGoatLib {
 
         public static GPlayer ModPlayer(Player player) => player.GetModPlayer<GPlayer>();
 
+        /// <summary>
+        /// Gets the player's mastery. Only works with GoatLib transformations.
+        /// </summary>
+        /// <param name="BuffId">Int Buff ID of the transformation.</param>
+        /// <returns>Mastery value.</returns>
         public float GetMastery(int BuffId) {
             if (Masteries.TryGetValue(BuffId, out var mastery))
                 return mastery;
+
             else return 0f;
         }
 
+        /// <summary>
+        /// Gets the player's mastery. Works with both GoatLib and DBT transformations.
+        /// </summary>
+        /// <param name="buffKeyName">Class Name of the buff.</param>
+        /// <returns>Mastery value.</returns>
+        public float GetMastery(string buffKeyName)
+        {
+            if (Defaults.MasteryPaths.TryGetValue(buffKeyName, out var masteryPath))
+            {
+                var ModPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+                dynamic myPlayer = ModPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
+
+                var path = ModPlayer.GetField(masteryPath);
+
+                return (float)path.GetValue(myPlayer);
+            }
+            return 0f;
+        }
+        
         public void HandleAuraLoopSound(AnimationData data) {
             if (data.Sound.Equals(new SoundData()))
                 return;
@@ -249,6 +338,70 @@ namespace DBZGoatLib {
             var transformation = TransformationHandler.GetCurrentTransformation(Player).Value;
 
             HandleMasteryGain(transformation);
+        }
+
+        public override void ProcessTriggers(TriggersSet triggersSet)
+        {
+            if (DBZGoatLib.OpenMenu.JustPressed)
+                TransformationMenu.Visible ^= true;
+            DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransMenu")).GetField("menuvisible").SetValue(null, false);
+            ProcessTransformationTriggers();
+        }
+        public void ProcessTransformationTriggers()
+        {
+            var transformation = FetchTransformation();
+
+            if (!transformation.HasValue && TransformationHandler.PowerDownKey.JustPressed)
+                TransformationHandler.ClearTransformations(Player);
+
+            else if (transformation.HasValue)
+                TransformationHandler.Transform(Player, transformation.Value);
+        }
+        public TransformationInfo? FetchTransformation()
+        {
+            if (TransformationHandler.TransformKey.JustPressed)
+            {
+                if (TransformationHandler.IsTransformed(Player, false))
+                {
+                    var current = TransformationHandler.GetCurrentTransformation(Player);
+                    if (!current.HasValue)
+                        return null;
+
+                    var chain = TransformationHandler.GetChain(current.Value, TransformationHandler.EnergyChargeKey.Current);
+                    if (!chain.HasValue)
+                        return null;
+                    if (string.IsNullOrEmpty(chain.Value.NextTransformationBuffKeyName))
+                        return null;
+                    return TransformationHandler.GetTransformation(chain.Value.NextTransformationBuffKeyName);
+                }
+                else
+                {
+                    return string.IsNullOrEmpty(TransformationMenu.ActiveForm) ? TransformationHandler.GetTransformation("SSJ1Buff") : TransformationHandler.GetTransformation(TransformationMenu.ActiveForm);
+                }
+            }
+            else if (TransformationHandler.PowerDownKey.JustPressed)
+            {
+                if (TransformationHandler.IsTransformed(Player, false))
+                {
+                    var current = TransformationHandler.GetCurrentTransformation(Player);
+                    if (!current.HasValue)
+                        return null;
+
+                    if (current.Value.buffKeyName == TransformationMenu.ActiveForm)
+                        return null;
+
+                    var chain = TransformationHandler.GetChain(current.Value, TransformationHandler.EnergyChargeKey.Current);
+                    if (!chain.HasValue)
+                        return null;
+                    if (string.IsNullOrEmpty(chain.Value.PreviousTransformationBuffKeyName))
+                        return null;
+                    return TransformationHandler.GetTransformation(chain.Value.PreviousTransformationBuffKeyName);
+                }
+                else
+                    return null;
+            }
+            else
+                return null;
         }
     }
 }
