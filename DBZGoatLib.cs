@@ -44,7 +44,7 @@ namespace DBZGoatLib
                 UIHandler.RegisterPanel(Defaults.DefaultPanel);
                 TransformationHandler.RegisterTransformationChains(Defaults.Chains);
 
-                foreach (var trait in Defaults.DBT_Traits())
+                foreach (var trait in Defaults.DBT_Traits)
                     TraitHandler.RegisterTrait(trait);
 
                 AddDetour(MyPlayer.AsType(), "HandleTransformations");
@@ -61,7 +61,7 @@ namespace DBZGoatLib
             foreach (var c in Defaults.Chains)
                 TransformationHandler.UnregisterTransformationChain(c);
 
-            foreach (var trait in Defaults.DBT_Traits())
+            foreach (var trait in Defaults.DBT_Traits)
                 TraitHandler.UnregisterTrait(trait);
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI) => NetworkHelper.HandlePacket(reader, whoAmI);

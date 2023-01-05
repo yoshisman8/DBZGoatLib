@@ -16,4 +16,7 @@
   <ItemGroup>
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="C:\Windows\System32\xcopy.exe /Y &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(USERPROFILE)\Documents\My Games\Terraria\tModLoader\ModSources\ModAssemblies\&quot;" />
+  </Target>
 </Project>

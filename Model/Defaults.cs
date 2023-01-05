@@ -12,7 +12,7 @@ namespace DBZGoatLib.Model
 {
     public static class Defaults
     {
-        public static List<Node> DefaultNodes = new()
+        public static Node[] DefaultNodes =
         {
             new Node(0, 2, "SSJ1Buff", "DBZMODPORT/UI/Buttons/SSJ1ButtonImage", "Only through failure with a powerful foe will true power awaken.", SSJ1Condition, (Player p) => true),
             new Node(1, 2, "SSJ2Buff", "DBZMODPORT/UI/Buttons/SSJ2ButtonImage", "One may awaken their true power through extreme pressure while ascended.", SSJ2Condition, SSJLineDiscovered),
@@ -24,49 +24,19 @@ namespace DBZGoatLib.Model
             new Node(4, 2, "SSJBBuff", "DBZMODPORT/UI/Buttons/SSJBButtonImage", "The experience from battling a galactic being could bring forth this strength.", SSJBCondition, SSJBRDiscovered),
             new Node(4, 1, "SSJRBuff", "DBZMODPORT/UI/Buttons/SSJRButtonImage", "The experience from battling a galactic being could bring forth this strength.", SSJRCondition, SSJBRDiscovered)
         };
-        
-        public static Connection[] GetConnections()
+
+        public static Connection[] Connections =
         {
-            List<Connection> connections = new();
+            new Connection(0, 2, 2, false, new Gradient(Color.Yellow)),
+            new Connection(0, 2, 1, true, new Gradient(Color.Yellow).AddStop(1f,Color.White)),
+            new Connection(0, 3, 1, false, new Gradient(Color.White).AddStop(0.25f, Color.LightGreen)),
+            new Connection(1, 3, 2, false, new Gradient(Color.LightGreen)),
+            new Connection(2, 2, 1, false, new Gradient(Color.Yellow).AddStop(1f, Color.Red)),
+            new Connection(3, 2, 1, false, new Gradient(Color.Red).AddStop(0.75f, Color.LightBlue)),
+            new Connection(4, 1, 1, true, new Gradient(Color.Purple).AddStop(0.75f, Color.LightBlue))
+        };
 
-            connections.Add(new Connection(0, 2, 2, false, new Gradient(Color.Yellow)));
-
-            var LegBridge1 = new Gradient(Color.Yellow);
-            //LegBridge1.AddStop(0.5f, Color.Yellow);
-            LegBridge1.AddStop(1f, Color.White);
-
-            connections.Add(new Connection(0, 2, 1f, true, LegBridge1));
-
-            var LegBridge2 = new Gradient(Color.White);
-            LegBridge2.AddStop(0.25f, Color.LightGreen);
-            LegBridge2.AddStop(1f, Color.LightGreen);
-
-            connections.Add(new Connection(0, 3, 1,false, LegBridge2));
-
-            connections.Add(new Connection(1, 3, 2, false, new Gradient(Color.LightGreen)));
-
-            var GodBridge = new Gradient(Color.Yellow);
-            //GodBridge.AddStop(0.5f,Color.Yellow);
-            GodBridge.AddStop(1f, Color.Red);
-
-            connections.Add(new Connection(2, 2, 1, false, GodBridge));
-
-            var BlueBridge = new Gradient(Color.Red);
-            BlueBridge.AddStop(0.75f, Color.LightBlue);
-            BlueBridge.AddStop(1f, Color.LightBlue);
-
-            connections.Add(new Connection(3,2,1,false, BlueBridge));
-
-            var RoseBridge = new Gradient(Color.Purple);
-            RoseBridge.AddStop(0.75f, Color.LightBlue);
-            RoseBridge.AddStop(1f, Color.LightBlue);
-
-            connections.Add(new Connection(4, 1, 1, true, RoseBridge));
-
-            return connections.ToArray();
-        }
-
-        public static TransformationPanel DefaultPanel = new TransformationPanel("Dragon Ball Terraria", true, DefaultNodes.ToArray(), GetConnections());
+        public static TransformationPanel DefaultPanel = new TransformationPanel("Dragon Ball Terraria", true, DefaultNodes, Connections);
 
         public static List<TransformationChain> Chains = new List<TransformationChain>()
         {
@@ -274,20 +244,11 @@ namespace DBZGoatLib.Model
             }
         }
 
-        public static List<TraitInfo> DBT_Traits()
+        public static TraitInfo[] DBT_Traits =
         {
-            var gradientProdigy = new Gradient(new Color(0, 104, 249));
-            gradientProdigy.AddStop(1f, new Color(7, 28, 76));
-
-            var gradientLeg = new Gradient(new Color(221, byte.MaxValue, 28));
-            gradientLeg.AddStop(1f, new Color(70, 150, 93));
-
-            List<TraitInfo> list = new();
-            list.Add(new TraitInfo("Legendary", 0.05f, gradientLeg, Legendary, UnTrait));
-            list.Add(new TraitInfo("Prodigy", 0.15f, gradientProdigy, Prodigy, UnTrait));
-
-            return list;
-        }
+            new TraitInfo("Legendary", 0.05f, new Gradient(new Color(221, byte.MaxValue, 28)).AddStop(1f, new Color(70, 150, 93)), Legendary, UnTrait),
+            new TraitInfo("Prodigy", 0.15f, new Gradient(new Color(0, 104, 249)).AddStop(1f, new Color(7, 28, 76)), Prodigy, UnTrait)
+        };
 
         private static void Legendary(Player player, TraitInfo trait)
         {
