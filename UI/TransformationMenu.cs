@@ -162,6 +162,8 @@ namespace DBZGoatLib.UI
             Title.Width.Set(200, 0f);
             Title.Left.Set(82, 0f);
             Title.Top.Set(14, 0f);
+            Title.OnMouseOver += (o,e) => { Tooltip = transformationPanel.Name; };
+            Title.OnMouseOut += (o, e) => { Tooltip = null; };
 
             Panel.Append(Title);
 
@@ -184,14 +186,22 @@ namespace DBZGoatLib.UI
 
             Panel.Append(Grid);
 
-            if (!transformationPanel.Complete && transformationPanel.Name != Defaults.DefaultPanel.Name)
+            if(transformationPanel.Name == Defaults.DefaultPanel.Name)
             {
-                var defPanel = Defaults.DefaultPanel;
-                foreach (var connection in defPanel.Connections)
+                foreach(var subpanel in UIHandler.Panels.Where(x => !x.Complete))
                 {
-                    var line = new TransConnector(connection);
-                    Connections.Add(line);
-                    Grid.Append(line);
+                    foreach (var connection in subpanel.Connections)
+                    {
+                        var line = new TransConnector(connection);
+                        Connections.Add(line);
+                        Grid.Append(line);
+                    }
+                    foreach (var node in subpanel.Nodes)
+                    {
+                        var Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
+                        Nodes.Add(Button);
+                        Grid.Append(Button);
+                    }
                 }
             }
 
@@ -200,17 +210,6 @@ namespace DBZGoatLib.UI
                 var line = new TransConnector(connection);
                 Connections.Add(line);
                 Grid.Append(line);
-            }
-
-            if (!transformationPanel.Complete && transformationPanel.Name != Defaults.DefaultPanel.Name)
-            {
-                var defPanel = Defaults.DefaultPanel;
-                foreach (var node in defPanel.Nodes)
-                {
-                    var Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
-                    Nodes.Add(Button);
-                    Grid.Append(Button);
-                }
             }
 
             foreach (var node in transformationPanel.Nodes)

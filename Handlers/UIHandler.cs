@@ -23,6 +23,7 @@ namespace DBZGoatLib.UI
         public static int ActivePanel = 0;
         public static bool Dirty;
 
+        internal static List<TransformationPanel> TruePanels => Panels.Where(x => x.Complete).ToList();
 
         /// <summary>
         /// Registers a new transformation panel.
@@ -53,14 +54,14 @@ namespace DBZGoatLib.UI
         internal static void PrevTree()
         {
             if (ActivePanel - 1 < 0)
-                ActivePanel = Panels.Count - 1;
+                ActivePanel = TruePanels.Count - 1;
             else
                 ActivePanel--;
             Dirty = true;
         }
         internal static void NextTree()
         {
-            if (ActivePanel + 1 >= Panels.Count)
+            if (ActivePanel + 1 >= TruePanels.Count)
                 ActivePanel = 0;
             else
                 ActivePanel++;
@@ -74,7 +75,7 @@ namespace DBZGoatLib.UI
             if (Dirty)
             {
                 transformationMenu.Remove();
-                transformationMenu = new TransformationMenu(Panels[ActivePanel]);
+                transformationMenu = new TransformationMenu(TruePanels[ActivePanel]);
 
                 _transUserInterface.SetState(transformationMenu);
                 Dirty = false;
