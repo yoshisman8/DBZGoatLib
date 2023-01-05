@@ -83,7 +83,14 @@ namespace DBZGoatLib.Model
             gradientStops = new List<Tuple<float, Color>>();
             gradientStops.Add(new Tuple<float, Color>(0f, color));
         }
-        
+        public Gradient(Color startColor, params (float percent, Color color)[] subsequentColors)
+        { 
+            gradientStops = new List<Tuple<float, Color>>() {
+                new Tuple<float, Color>(0, startColor)
+            };
+            gradientStops.AddRange(from color_value_pair in subsequentColors select new Tuple<float, Color>(color_value_pair.percent, color_value_pair.color));
+        }
+
         /// <summary>
         /// Adds a new color point to this gradient at a specified percent point in its length.
         /// </summary>
