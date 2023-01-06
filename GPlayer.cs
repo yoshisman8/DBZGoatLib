@@ -347,6 +347,13 @@ namespace DBZGoatLib {
             DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransMenu")).GetField("menuvisible").SetValue(null, false);
             ProcessTransformationTriggers();
         }
+
+        public override void OnRespawn(Player player)
+        {
+            TransformationHandler.ClearTransformations(player);
+            base.OnRespawn(player);
+        }
+
         public void ProcessTransformationTriggers()
         {
             var transformation = FetchTransformation();
