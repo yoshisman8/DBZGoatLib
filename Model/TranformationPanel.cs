@@ -185,10 +185,10 @@ namespace DBZGoatLib.Model
         /// <param name="buffKeyName">The form's buffKeyName as defined in its registerd TransformationInfo.</param>
         /// <param name="iconPath">The string path to the sprite to be used for this node.</param>
         /// <param name="unlockHint">The hint to be displayed when the user clicks on this node while undiscovered or unlocked.</param>
-        /// <param name="viewOnly">If set to true, this node can never be selected, and instead will only be used to see the Mastery value of the form when hovered.</param>
         /// <param name="unlockCondition">Delegate which returns whether this node has been unlocked or not (controls lock icon).</param>
         /// <param name="discoverCondition">Delegate which returns whether this mode has been discovered or not (controls sprite display).</param>
         /// <param name="onSelect">(Optional) Delegate which is ran when the user successfully selects this node.</param>
+        /// <param name="viewOnly">If set to true, this node can never be selected, and instead will only be used to see the Mastery value of the form when hovered.</param>
         public Node(float PositionX, float PositionY, string buffKeyName, string iconPath, string unlockHint, Predicate<Player> unlockCondition, Predicate<Player> discoverCondition, bool viewOnly = false, Action<Player> onSelect = null)
         {
             PosX = PositionX;

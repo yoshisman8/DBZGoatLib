@@ -55,20 +55,22 @@ namespace DBZGoatLib.UI
         }
         public override void Click(UIMouseEvent evt)
         {
-            if (!Node.ViewOnly)
+            
+
+            if (!Node.UnlockCondition(Main.CurrentPlayer) || !Node.DiscoverCondition(Main.CurrentPlayer))
             {
-                Node.OnSelect?.Invoke(Main.CurrentPlayer);
+                SoundHandler.PlayVanillaSound(SoundID.MenuTick, Main.CurrentPlayer.position);
+                Main.NewText(Node.UnlockHint);
                 return;
             }
 
             SoundHandler.PlayVanillaSound(SoundID.MenuTick, Main.CurrentPlayer.position);
 
-            if (!Node.UnlockCondition(Main.CurrentPlayer) || !Node.DiscoverCondition(Main.CurrentPlayer))
+            if (!Node.ViewOnly)
             {
-                Main.NewText(Node.UnlockHint);
+                Node.OnSelect?.Invoke(Main.CurrentPlayer);
                 return;
             }
-
             TransformationMenu.ActiveForm = Node.BuffKeyName;
 
             Node.OnSelect?.Invoke(Main.CurrentPlayer);
