@@ -1,4 +1,5 @@
 ﻿using DBZGoatLib.Model;
+using DBZGoatLib.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -10,7 +11,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace DBZGoatLib.UI
+namespace DBZGoatLib.Handlers
 {
     public class UIHandler : ModSystem
     {
