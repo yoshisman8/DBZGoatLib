@@ -55,8 +55,6 @@ namespace DBZGoatLib.UI
         }
         public override void Click(UIMouseEvent evt)
         {
-            
-
             if (!Node.UnlockCondition(Main.CurrentPlayer) || !Node.DiscoverCondition(Main.CurrentPlayer))
             {
                 SoundHandler.PlayVanillaSound(SoundID.MenuTick, Main.CurrentPlayer.position);
@@ -66,7 +64,7 @@ namespace DBZGoatLib.UI
 
             SoundHandler.PlayVanillaSound(SoundID.MenuTick, Main.CurrentPlayer.position);
 
-            if (!Node.ViewOnly)
+            if (Node.ViewOnly)
             {
                 Node.OnSelect?.Invoke(Main.CurrentPlayer);
                 return;

@@ -89,6 +89,8 @@ namespace DBZGoatLib {
                     MasteryMaxed.Add(trans.buffID, false);
             }
 
+            UIHandler.Dirty = true;
+
             if (!Traited)
                 RollTraits();
             else
