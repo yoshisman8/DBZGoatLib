@@ -48,6 +48,8 @@ namespace DBZGoatLib
                     TraitHandler.RegisterTrait(trait);
 
                 AddDetour(MyPlayer.AsType(), "HandleTransformations");
+                AddDetour(MyPlayer.AsType(), "HandleKiDrainMasteryContribution");
+                AddDetour(MyPlayer.AsType(), "HandleDamageReceivedMastery");
 
                 var WishMenu = DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("WishMenu"));
 
@@ -63,6 +65,13 @@ namespace DBZGoatLib
 
             foreach (var trait in Defaults.DBT_Traits)
                 TraitHandler.UnregisterTrait(trait);
+        }
+
+        public override void PostSetupContent()
+        {
+            base.PostSetupContent();
+            foreach (var form in ModContent.GetContent<Transformation>())
+                form.Load();
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI) => NetworkHelper.HandlePacket(reader, whoAmI);
 

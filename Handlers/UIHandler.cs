@@ -35,7 +35,26 @@ namespace DBZGoatLib.Handlers
         /// Unregister a transformation panel. 
         /// </summary>
         public static void UnregisterPanel(TransformationPanel panel) => Panels.Remove(panel);
-
+        
+        public static void TryChangePanel(string Name)
+        {
+            if (TruePanels.Any(x=>x.Name == Name))
+            {
+                int index = TruePanels.FindIndex(x => x.Name == Name);
+                if (TruePanels[index].Predicate == null)
+                    ActivePanel = index;
+                else if (TruePanels[index].Predicate.Invoke(Main.CurrentPlayer))
+                    ActivePanel = index;
+                else
+                    ActivePanel = 0;
+                Dirty = true;
+            }
+            else
+            {
+                ActivePanel = 0;
+                Dirty = true;
+            }
+        }
         public override void Load()
         {
             base.Load();
@@ -75,10 +94,22 @@ namespace DBZGoatLib.Handlers
 
             if (Dirty)
             {
+                if (!TruePanels[ActivePanel].Predicate.Invoke(Main.CurrentPlayer))
+                {
+                    NextTree();
+                    return;
+                }
                 transformationMenu.Remove();
                 transformationMenu = new TransformationMenu(TruePanels[ActivePanel]);
 
                 _transUserInterface.SetState(transformationMenu);
+
+                kiBar = new KiBar();
+                kiBar.Activate();
+
+                _kiUserInterface = new UserInterface();
+                _kiUserInterface.SetState(kiBar);
+
                 Dirty = false;
             }
 

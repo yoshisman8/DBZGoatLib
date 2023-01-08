@@ -86,7 +86,7 @@ namespace DBZGoatLib.UI
             if (TransformationHandler.DBTForms.Contains(form))
                 Quotient = (float)Player.GetMastery(form) / 1f;
             else
-                Quotient = (float)Player.GetMastery(TransformationHandler.GetTransformation(form).buffID) / 1f;
+                Quotient = (float)Player.GetMastery(TransformationHandler.GetTransformation(form).Value.buffID) / 1f;
 
             Quotient = Utils.Clamp(Quotient, 0f, 1f);
 
@@ -117,7 +117,7 @@ namespace DBZGoatLib.UI
                     Tooltip = string.Format("{0:P2} Mastery", Defaults.GetMastery(Main.CurrentPlayer, ActiveForm));
                 }
                 else
-                    Tooltip = string.Format("{0:P2} Mastery", Main.CurrentPlayer.GetModPlayer<GPlayer>().GetMastery(TransformationHandler.GetTransformation(ActiveForm).buffID));
+                    Tooltip = string.Format("{0:P2} Mastery", Main.CurrentPlayer.GetModPlayer<GPlayer>().GetMastery(TransformationHandler.GetTransformation(ActiveForm).Value.buffID));
             }
                 
         }

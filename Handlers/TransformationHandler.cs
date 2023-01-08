@@ -104,24 +104,34 @@ namespace DBZGoatLib.Handlers {
         /// <summary>
         /// Gets a transformation by its Buff ID.
         /// Cannot return DBT Transformation info.
+        /// Returns null when the transformation cannot be found.
         /// </summary>
         /// <param name="buffid">Buff ID</param>
         /// <returns></returns>
-        public static TransformationInfo GetTransformation(int buffid) => Transformations.First(x => x.buffID == buffid);
+        public static TransformationInfo? GetTransformation(int buffid)
+        {
+            if (!Transformations.Any(x => x.buffID == buffid))
+                return null;
+            else 
+                return Transformations.First(x => x.buffID == buffid);
+        }
 
         /// <summary>
         /// Gets a transformation by its Buff class name. 
         /// Can fetch DBT transformations.
+        /// Returns null when the transformation cannot be found.
         /// </summary>
         /// <param name="buffName">Buff class name</param>
         /// <returns></returns>
-        public static TransformationInfo GetTransformation(string buffName)
+        public static TransformationInfo? GetTransformation(string buffName)
         {
             if (DBTForms.Contains(buffName))
             {
                 return DBT_Transformation_Info.First(x => x.buffKeyName == buffName);
             }
-            else return Transformations.First(x => x.buffKeyName == buffName);
+            else if (Transformations.Any(x => x.buffKeyName == buffName))
+                return Transformations.First(x => x.buffKeyName == buffName);
+            else return null;
         }
 
         /// <summary>
@@ -142,8 +152,6 @@ namespace DBZGoatLib.Handlers {
             if (!transformation.condition(player))
                 return;
 
-            if (transformation.KiBarGradient != null)
-                KiBar.SetTransformationColor(transformation.KiBarGradient);
             ClearTransformations(player);
             StartTransformation(player, transformation);
         }
@@ -157,8 +165,6 @@ namespace DBZGoatLib.Handlers {
 
             if (!(bool)canTransform.Invoke(null, new object[] { player, buffInfo }))
                 return;
-            if (form.KiBarGradient != null)
-                KiBar.SetTransformationColor(form.KiBarGradient);
             doTransform.Invoke(null, new object[] {player, buffInfo, DBZGoatLib.DBZMOD.Value.mod });
         }
         /// <summary>
@@ -170,9 +176,6 @@ namespace DBZGoatLib.Handlers {
             helper.GetMethod("EndTransformations").Invoke(null, new object[] { player });
 
             SoundHandler.PlaySound("DBZMODPORT/Sounds/PowerDown", player, 0.3f);
-
-            if(player.whoAmI == Main.myPlayer)
-                KiBar.ResetTransformationColor();
 
             foreach (var transformation in Transformations) {
                 EndTranformation(player, transformation);

@@ -42,7 +42,10 @@ namespace DBZGoatLib {
 
         public bool Traited;
         public string Trait;
+        public float MasteryMultiplier = 1f;
 
+        internal string SavedTree;
+        internal string SavedSelection;
         public override void SaveData(TagCompound tag) {
             foreach (var trans in TransformationHandler.Transformations) {
                 if (Masteries.TryGetValue(trans.buffID, out float mastery) && !tag.ContainsKey($"DBZGoatLib_{trans.buffKeyName}")) {
@@ -52,6 +55,7 @@ namespace DBZGoatLib {
                     tag.Add($"DBZGoatLib_{trans.buffKeyName}_Maxed", maxed);
                 }
             }
+            tag.Add("DBZGoatLib_SelectedPanel", UIHandler.TruePanels[UIHandler.ActivePanel].Name);
             tag.Add("DBZGoatLib_SelectedForm", TransformationMenu.ActiveForm);
             tag.Add("DBZGoatLib_Trait", Trait);
             tag.Add("DBZGoatLib_Traited", Traited);
@@ -71,7 +75,9 @@ namespace DBZGoatLib {
                 }
             }
             if (tag.ContainsKey("DBZGoatLib_SelectedForm"))
-                TransformationMenu.ActiveForm = tag.GetString("DBZGoatLib_SelectedForm");
+                SavedSelection = tag.GetString("DBZGoatLib_SelectedForm");
+            if (tag.ContainsKey("DBZGoatLib_SelectedPanel"))
+                SavedTree = tag.GetString("DBZGoatLib_SelectedPanel");
 
             if (tag.ContainsKey("DBZGoatLib_Trait"))
                 Trait = tag.GetString("DBZGoatLib_Trait");
@@ -89,6 +95,10 @@ namespace DBZGoatLib {
                     MasteryMaxed.Add(trans.buffID, false);
             }
 
+            if(!string.IsNullOrEmpty(SavedTree))
+                UIHandler.TryChangePanel(SavedTree);
+            if (!string.IsNullOrEmpty(SavedSelection))
+                TransformationMenu.ActiveForm = SavedSelection;
             UIHandler.Dirty = true;
 
             if (!Traited)
@@ -97,7 +107,7 @@ namespace DBZGoatLib {
             {
                 var traitInfo = TraitHandler.GetTraitByName(Trait);
                 if(traitInfo.HasValue)
-                    traitInfo.Value.IfTrait(Player,traitInfo.Value);
+                    traitInfo.Value.IfTrait(Player);
             }
         }
         internal void ClearDBTTrait()
@@ -118,7 +128,7 @@ namespace DBZGoatLib {
 
             Trait = rolled.Name;
 
-            rolled.IfTrait(Player, rolled);
+            rolled.IfTrait(Player);
 
             Traited = true;
 
@@ -131,13 +141,13 @@ namespace DBZGoatLib {
             var current = TraitHandler.GetTraitByName(Trait);
 
             if (current.HasValue)
-                current.Value.IfUntrait(Player, current.Value);
+                current.Value.IfUntrait(Player);
 
             var rolled = TraitHandler.RollTrait(false, Trait);
 
             Trait = rolled.Name;
 
-            rolled.IfTrait(Player, rolled);
+            rolled.IfTrait(Player);
 
             TransformationMenu.Dirty = true;
         }
@@ -285,11 +295,17 @@ namespace DBZGoatLib {
                     }
                     return;
                 } else {
-                    var myPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
-                    var instance = myPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
-                    bool prodigy = (bool)myPlayer.GetMethod("IsProdigy").Invoke(instance, null);
-                    Masteries[transformation.buffID] = Math.Min(1f, value + (0.00232f * (prodigy ? 2f : 1f)));
+                    Masteries[transformation.buffID] = Math.Min(1f, value + (0.00232f * MasteryMultiplier));
                 }
+            }
+            else if (Defaults.MasteryPaths.TryGetValue(transformation.buffKeyName,out string path))
+            {
+                var myPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+                var instance = myPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
+                var masteryField = myPlayer.GetField(path, DBZGoatLib.flagsAll);
+                float mastery = (float)masteryField.GetValue(instance);
+                masteryField.SetValue(myPlayer, Math.Min(1f, mastery + (0.00232f * MasteryMultiplier)));
+
             }
         }
 

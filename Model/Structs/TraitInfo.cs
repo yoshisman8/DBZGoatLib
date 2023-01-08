@@ -12,8 +12,8 @@ namespace DBZGoatLib.Model
     {
         public readonly double Weight;
         public readonly string Name;
-        public readonly Action<Player, TraitInfo> IfTrait;
-        public readonly Action<Player, TraitInfo> IfUntrait;
+        public readonly Action<Player> IfTrait;
+        public readonly Action<Player> IfUntrait;
         public readonly Gradient Color;
 
         /// <param name="name">Name of the trait.</param>
@@ -21,7 +21,7 @@ namespace DBZGoatLib.Model
         /// <param name="color">Color gradient for the Ki Bar when this trait is active. Set to Null to not change the Ki Bar color.</param>
         /// <param name="ifTrait">Delegate which runs once when the user gains this trait and during player connecting.</param>
         /// <param name="ifUntrait">Delegate which runs once when the user loses this trait.</param>
-        public TraitInfo(string name, double chance, Gradient color, Action<Player, TraitInfo> ifTrait, Action<Player, TraitInfo> ifUntrait)
+        public TraitInfo(string name, double chance, Gradient color, Action<Player> ifTrait, Action<Player> ifUntrait)
         {
             Name = name;
             Weight = chance;

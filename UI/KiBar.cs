@@ -64,8 +64,12 @@ namespace DBZGoatLib.UI
             Player player = Main.CurrentPlayer;
 
             if (TransformationHandler.IsTransformed(player))
-                if (TransformedGradient != null)
-                    return TransformedGradient;
+            {
+                var transForm = TransformationHandler.GetAllCurrentForms(Main.CurrentPlayer);
+                if (transForm.Any(x => x.KiBarGradient != null))
+                    return transForm.First(x => x.KiBarGradient != null).KiBarGradient;
+                else return DefaultColor;
+            }
             var trait = TraitHandler.GetTraitByName(Main.CurrentPlayer.GetModPlayer<GPlayer>().Trait);
             if (trait.HasValue)
                 if (trait.Value.Color != null)

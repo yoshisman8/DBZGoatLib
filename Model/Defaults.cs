@@ -36,7 +36,7 @@ namespace DBZGoatLib.Model
             new Connection(4, 1, 1, true, new Gradient(Color.Purple).AddStop(0.75f, Color.LightBlue))
         };
 
-        public static TransformationPanel DefaultPanel = new TransformationPanel("Dragon Ball Terraria", true, DefaultNodes, Connections);
+        public static TransformationPanel DefaultPanel = new TransformationPanel("Dragon Ball Terraria", true, DefaultNodes, Connections, (p) => { return true; });
 
         public static List<TransformationChain> Chains = new List<TransformationChain>()
         {
@@ -250,7 +250,7 @@ namespace DBZGoatLib.Model
             new TraitInfo("Prodigy", 0.15f, new Gradient(new Color(0, 104, 249)).AddStop(1f, new Color(7, 28, 76)), Prodigy, UnTrait)
         };
 
-        private static void Legendary(Player player, TraitInfo trait)
+        private static void Legendary(Player player)
         {
             var MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
 
@@ -260,7 +260,7 @@ namespace DBZGoatLib.Model
 
             playerTrait.SetValue(modPlayer, "Legendary");
         }
-        private static void UnTrait(Player player, TraitInfo trait)
+        private static void UnTrait(Player player)
         {
             var MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
 
@@ -272,7 +272,7 @@ namespace DBZGoatLib.Model
 
             KiBar.ResetColor();
         }
-        private static void Prodigy(Player player, TraitInfo trait)
+        private static void Prodigy(Player player)
         {
             var MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
 

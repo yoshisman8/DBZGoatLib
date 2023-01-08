@@ -28,13 +28,20 @@ namespace DBZGoatLib.Model
         /// </summary>
         public readonly bool Complete;
 
-        /// <param name="name">The display name for this node, this will be displayed at the top of the transformation UI.</param>
-        public TransformationPanel(string name, bool complete, Node[] nodes, Connection[] connections)
+        public readonly Predicate<Player> Predicate;
+
+        /// <param name="name">The name of this panel. This must be unique to prevent clashes with existing panels. Name is displayed at the top of the transformation UI.</param>
+        /// <param name="complete">Whether this is a complete panel (true) or a partial panel to be appended to the DBT's panel (false).</param>
+        /// <param name="nodes">The nodes this panel has.</param>
+        /// <param name="connections">The connectors this panel has.</param>
+        /// <param name="predicate">Optional delegate. If this delegate returns false, the panel will be skipped when cycling panels.</param>
+        public TransformationPanel(string name, bool complete, Node[] nodes, Connection[] connections, Predicate<Player> predicate)
         {
             Name = name;
             Nodes = nodes;
             Connections = connections;
             Complete = complete;
+            Predicate = predicate;
         }
     }
 

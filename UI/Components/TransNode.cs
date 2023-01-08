@@ -83,7 +83,7 @@ namespace DBZGoatLib.UI
             if (!Node.DiscoverCondition(Main.CurrentPlayer))
                 TransformationMenu.Tooltip = "???";
             else
-                TransformationMenu.Tooltip = TransformationHandler.GetTransformation(Node.BuffKeyName).transformationText;
+                TransformationMenu.Tooltip = TransformationHandler.GetTransformation(Node.BuffKeyName).Value.transformationText;
             TransformationMenu.HoveredForm = Node.BuffKeyName;
         }
 

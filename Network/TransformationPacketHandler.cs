@@ -40,9 +40,9 @@ namespace DBZGoatLib.Network {
             } else {
                 Player player = Main.player[whichPlayer];
                 if (duration == 0)
-                    TransformationHandler.EndTranformation(player, TransformationHandler.GetTransformation(buffID));
+                    TransformationHandler.EndTranformation(player, TransformationHandler.GetTransformation(buffID).Value);
                 else
-                    TransformationHandler.Transform(player, TransformationHandler.GetTransformation(buffID));
+                    TransformationHandler.Transform(player, TransformationHandler.GetTransformation(buffID).Value);
             }
         }
     }
