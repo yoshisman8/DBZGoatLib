@@ -169,15 +169,19 @@ namespace DBZGoatLib {
                 var stackable = TransformationHandler.GetCurrentStackedTransformation(drawInfo.drawPlayer);
 
                 if (stackable.HasValue && !form.HasValue)
+                {
                     if (!string.IsNullOrEmpty(stackable.Value.animationData.HairPath))
                     {
-                        drawInfo.colorHair = Color.Transparent;
+                        drawInfo.drawPlayer.head = 0;
                     }
+                }
                 else if (form.HasValue)
+                {
                     if (!string.IsNullOrEmpty(form.Value.animationData.HairPath))
                     {
-                        drawInfo.colorHair = Color.Transparent;
+                        drawInfo.drawPlayer.head = 0;
                     }
+                }  
             }
         }
         public override void PreUpdateMovement() {
