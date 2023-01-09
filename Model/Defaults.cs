@@ -270,7 +270,6 @@ namespace DBZGoatLib.Model
 
             playerTrait.SetValue(modPlayer, "");
 
-            KiBar.ResetColor();
         }
         private static void Prodigy(Player player)
         {

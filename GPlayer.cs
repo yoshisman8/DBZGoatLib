@@ -161,10 +161,30 @@ namespace DBZGoatLib {
                 pClass.GetField("isCharging").SetValue(modPlayer, false);
             }
         }
+        public override void HideDrawLayers(PlayerDrawSet drawInfo)
+        {
+            if (TransformationHandler.IsTransformed(drawInfo.drawPlayer))
+            {
+                var form = TransformationHandler.GetCurrentTransformation(drawInfo.drawPlayer);
+                var stackable = TransformationHandler.GetCurrentStackedTransformation(drawInfo.drawPlayer);
 
+                if (stackable.HasValue && !form.HasValue)
+                    if (!string.IsNullOrEmpty(stackable.Value.animationData.HairPath))
+                    {
+                        drawInfo.colorHair = Color.Transparent;
+                    }
+                else if (form.HasValue)
+                    if (!string.IsNullOrEmpty(form.Value.animationData.HairPath))
+                    {
+                        drawInfo.colorHair = Color.Transparent;
+                    }
+            }
+        }
         public override void PreUpdateMovement() {
             if (TransformationHandler.IsTransformed(Player)) {
-                currentAnimation = TransformationHandler.GetCurrentTransformation(Player).Value.animationData;
+                var forms = TransformationHandler.GetCurrentTransformation(Player) ?? TransformationHandler.GetCurrentStackedTransformation(Player);
+
+                currentAnimation = forms.Value.animationData;
 
                 if (!currentAnimation.Equals(previousAnimation)) {
                     auraSoundInfo = SoundHandler.KillTrackedSound(auraSoundInfo);
@@ -257,7 +277,7 @@ namespace DBZGoatLib {
 
         public override void PostUpdate() {
             if (TransformationHandler.IsTransformed(Player)) {
-                if (TransformationHandler.GetCurrentTransformation(Player).Value.animationData.Sparks) {
+                if (TransformationHandler.GetAllCurrentForms(Player).Any(x=>x.animationData.Sparks)) {
                     lightning3FrameTime++;
                 }
             }
@@ -279,7 +299,10 @@ namespace DBZGoatLib {
             if (LastMasteryTick.HasValue && TransformationHandler.IsTransformed(Player))
                 if ((DateTime.Now - LastMasteryTick.Value).TotalSeconds >= 1) {
                     LastMasteryTick = DateTime.Now;
-                    HandleMasteryGain(TransformationHandler.GetCurrentTransformation(Player).Value);
+                    var transformation = TransformationHandler.GetAllCurrentForms(Player);
+
+                    foreach (var form in transformation)
+                        HandleMasteryGain(form);
                 }
         }
 
@@ -304,7 +327,7 @@ namespace DBZGoatLib {
                 var instance = myPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
                 var masteryField = myPlayer.GetField(path, DBZGoatLib.flagsAll);
                 float mastery = (float)masteryField.GetValue(instance);
-                masteryField.SetValue(myPlayer, Math.Min(1f, mastery + (0.00232f * MasteryMultiplier)));
+                masteryField.SetValue(instance, Math.Min(1f, mastery + (0.00232f * MasteryMultiplier)));
 
             }
         }
@@ -322,8 +345,10 @@ namespace DBZGoatLib {
                 return;
             LastHitEnemy = DateTime.Now;
 
-            var transformation = TransformationHandler.GetCurrentTransformation(Player).Value;
-            HandleMasteryGain(transformation);
+            var transformation = TransformationHandler.GetAllCurrentForms(Player);
+
+            foreach (var form in transformation)
+                HandleMasteryGain(form);
         }
 
         public override void OnHitByNPC(NPC npc, int damage, bool crit) {
@@ -337,9 +362,10 @@ namespace DBZGoatLib {
                 return;
             LastHit = DateTime.Now;
 
-            var transformation = TransformationHandler.GetCurrentTransformation(Player).Value;
+            var transformation = TransformationHandler.GetAllCurrentForms(Player);
 
-            HandleMasteryGain(transformation);
+            foreach (var form in transformation)
+                HandleMasteryGain(form);
         }
 
         public override void OnHitByProjectile(Projectile proj, int damage, bool crit) {
@@ -353,9 +379,10 @@ namespace DBZGoatLib {
                 return;
             LastHit = DateTime.Now;
 
-            var transformation = TransformationHandler.GetCurrentTransformation(Player).Value;
+            var transformation = TransformationHandler.GetAllCurrentForms(Player);
 
-            HandleMasteryGain(transformation);
+            foreach (var form in transformation)
+                HandleMasteryGain(form);
         }
 
         public override void ProcessTriggers(TriggersSet triggersSet)
@@ -386,7 +413,7 @@ namespace DBZGoatLib {
         {
             if (TransformationHandler.TransformKey.JustPressed)
             {
-                if (TransformationHandler.IsTransformed(Player, false))
+                if (TransformationHandler.IsTransformed(Player, true))
                 {
                     var current = TransformationHandler.GetCurrentTransformation(Player);
                     if (!current.HasValue)
@@ -406,7 +433,7 @@ namespace DBZGoatLib {
             }
             else if (TransformationHandler.PowerDownKey.JustPressed)
             {
-                if (TransformationHandler.IsTransformed(Player, false))
+                if (TransformationHandler.IsTransformed(Player, true))
                 {
                     var current = TransformationHandler.GetCurrentTransformation(Player);
                     if (!current.HasValue)

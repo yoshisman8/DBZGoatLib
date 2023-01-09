@@ -29,35 +29,6 @@ namespace DBZGoatLib.UI
         private List<float> CleanAverageKi = new();
         public static float AverageKi = 0;
         public static int MaxKi = 1;
-        /// <summary>
-        /// Sets the ki bar's color to a new gradient.
-        /// </summary>
-        /// <param name="gradient">Gradient object.</param>
-        public static void SetColor(Gradient gradient)
-        {
-            BarGradient = gradient;
-        }
-
-        public static void SetTransformationColor(Gradient gradient)
-        {
-            TransformedGradient = gradient;
-        }
-
-        /// <summary>
-        /// Resets the Ki bar to its default color.
-        /// </summary>
-        public static void ResetTransformationColor()
-        {
-            TransformedGradient = null;
-        }
-
-        /// <summary>
-        /// Resets the Ki bar to its default color.
-        /// </summary>
-        public static void ResetColor()
-        {
-            BarGradient = DefaultColor;
-        }
 
         public static Gradient GetColor()
         {
@@ -65,18 +36,28 @@ namespace DBZGoatLib.UI
 
             if (TransformationHandler.IsTransformed(player))
             {
-                var transForm = TransformationHandler.GetAllCurrentForms(Main.CurrentPlayer);
-                if (transForm.Any(x => x.KiBarGradient != null))
-                    return transForm.First(x => x.KiBarGradient != null).KiBarGradient;
-                else return DefaultColor;
+                return GetTransformationColor() ?? GetTraitColor() ?? DefaultColor;
             }
+            
+            else return GetTraitColor() ?? DefaultColor;
+        }
+        private static Gradient GetTraitColor()
+        {
             var trait = TraitHandler.GetTraitByName(Main.CurrentPlayer.GetModPlayer<GPlayer>().Trait);
             if (trait.HasValue)
                 if (trait.Value.Color != null)
                     return trait.Value.Color;
-                else return DefaultColor;
-            else return DefaultColor;
+                else return null;
+            else return null;
         }
+        private static Gradient GetTransformationColor()
+        {
+            var transForm = TransformationHandler.GetAllCurrentForms(Main.CurrentPlayer);
+            if (transForm.Any(x => x.KiBarGradient != null))
+                return transForm.First(x => x.KiBarGradient != null).KiBarGradient;
+            else return null;
+        }
+
         public override void OnInitialize()
         {
             base.OnInitialize();

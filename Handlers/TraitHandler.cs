@@ -62,6 +62,6 @@ namespace DBZGoatLib.Handlers
 
             return rolledTrait;
         }
-        private static void Traitless(Player player) { KiBar.ResetColor(); player.GetModPlayer<GPlayer>().ClearDBTTrait(); }
+        private static void Traitless(Player player) {  player.GetModPlayer<GPlayer>().ClearDBTTrait(); }
     }
 }

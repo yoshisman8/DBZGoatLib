@@ -1,8 +1,7 @@
 displayName = Vyklade's DBT Transformation Lib
 author = Vyklade
-version = 1.6.1
+version = 1.6.2
 modReferences = DBZMODPORT
-sortAfter = dbzcalamity
 includeSource = false
 hideResources = true
 homepage = https://github.com/yoshisman8/DBZGoatLib

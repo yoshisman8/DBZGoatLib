@@ -102,6 +102,7 @@ namespace DBZGoatLib.Model {
         }
 
         public string BuildTooltip() {
+            var dmg = damageMulti - 1f;
             var speed = speedMulti - 1f;
 
             float num1 = 60f * kiDrainRate;
@@ -109,14 +110,22 @@ namespace DBZGoatLib.Model {
 
             StringBuilder sb = new StringBuilder();
 
-            if (damageMulti != 0f)
-                sb.Append($"Damage {(damageMulti > 0 ? '+' : '-')}{damageMulti:P2} ");
+            if (dmg != 0f)
+                sb.Append($"Damage {(dmg > 0 ? '+' : "")}{dmg:P2} ");
             if (speed != 0f)
-                sb.AppendLine($"Speed {(speed > 0 ? '+' : '-')}{speed:P2}");
+                if(dmg != 0)
+                    sb.AppendLine($" | Speed {(speed > 0 ? '+' : "")}{speed:P2}");
+                else
+                    sb.AppendLine($"Speed {(speed > 0 ? '+' : "")}{speed:P2}");
+            if (baseDefenceBonus != 0)
+                sb.Append($"Defense {(baseDefenceBonus > 0 ? '+' : "")}{baseDefenceBonus:N0}");
             if (attackDrainMulti != 0f)
-                sb.AppendLine($"Ki Costs {(attackDrainMulti > 0 ? '+' : '-')}{attackDrainMulti:P2}");
-
-            sb.AppendLine($"Ki Drain {MathF.Round(num1):N0}/s, {MathF.Round(num2):N0}/s when mastered");
+                if(baseDefenceBonus != 0)
+                    sb.AppendLine($" | Ki Costs {(attackDrainMulti > 0 ? '+' : '-')}{attackDrainMulti:P2}");
+                else
+                    sb.AppendLine($"Ki Costs {(attackDrainMulti > 0 ? '+' : '-')}{attackDrainMulti:P2}");
+            if(kiDrainRate != 0)
+                sb.Append($"Ki Drain {MathF.Round(num1):N0}/s, {MathF.Round(num2):N0}/s when mastered");
 
             return sb.ToString();
         }
@@ -137,22 +146,35 @@ namespace DBZGoatLib.Model {
 
             float drain = GPlayer.ModPlayer(player).GetMastery(Type) < 1f ? kiDrainRate : kiDrainRateWithMastery;
 
-            player.statDefense += baseDefenceBonus;
 
-            modPlayer.AddKi(drain * -1f, false, true);
+            if(baseDefenceBonus != 0)
+                player.statDefense += baseDefenceBonus;
+            
+            if(drain != 0)
+                modPlayer.AddKi(drain * -1f, false, true);
 
-            player.moveSpeed *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
-            player.maxRunSpeed *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
-            player.runAcceleration *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
-            if (player.jumpSpeedBoost < 1f) {
-                player.jumpSpeedBoost = 1f;
+            if(speedMulti != 0)
+            {
+                player.moveSpeed *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
+                player.maxRunSpeed *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
+                player.runAcceleration *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
+                if (player.jumpSpeedBoost < 1f)
+                {
+                    player.jumpSpeedBoost = 1f;
+                }
+
+                player.jumpSpeedBoost *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
             }
+            
+            if(damageMulti != 0)
+            {
+                player.GetDamage(DamageClass.Generic) *= damageMulti;
 
-            player.jumpSpeedBoost *= 1f + (speedMulti - 1f) * modPlayer.bonusSpeedMultiplier;
-            player.GetDamage(DamageClass.Generic) *= damageMulti;
-
-            KiDrainRate.SetValue(modPlayer, attackDrainMulti);
-            KiDamage.SetValue(modPlayer, modPlayer.KiDamage * damageMulti);
+                KiDamage.SetValue(modPlayer, modPlayer.KiDamage * damageMulti);
+            }
+            
+            if(attackDrainMulti != 0)
+                KiDrainRate.SetValue(modPlayer, attackDrainMulti);
 
             base.Update(player, ref buffIndex);
         }

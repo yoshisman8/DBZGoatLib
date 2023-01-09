@@ -25,7 +25,7 @@ namespace DBZGoatLib
 
         public static readonly Lazy<Mod> Instance = new(() => ModLoader.GetMod("DBZGoatLib"));
         public static readonly Lazy<(bool loaded, Mod mod)> DBZMOD = new(() => (ModLoader.TryGetMod("DBZMODPORT", out Mod dbz), dbz));
-        public static readonly Lazy<(bool loaded, Mod mod)> DBCAMOD = new(() => (ModLoader.TryGetMod("dbzcalamity", out Mod dbca), dbca));
+        // public static readonly Lazy<(bool loaded, Mod mod)> DBCAMOD = new(() => (ModLoader.TryGetMod("dbzcalamity", out Mod dbca), dbca));
 
         public static ModKeybind OpenMenu;
         public override void Load()

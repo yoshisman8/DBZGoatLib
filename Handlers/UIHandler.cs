@@ -47,12 +47,10 @@ namespace DBZGoatLib.Handlers
                     ActivePanel = index;
                 else
                     ActivePanel = 0;
-                Dirty = true;
             }
             else
             {
                 ActivePanel = 0;
-                Dirty = true;
             }
         }
         public override void Load()

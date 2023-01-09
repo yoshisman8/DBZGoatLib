@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using ReLogic.Content;
-
+using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -26,8 +26,9 @@ namespace DBZGoatLib.Layers {
             if (Main.netMode != NetmodeID.Server) {
                 if (drawInfo.shadow == 0f) {
                     if (TransformationHandler.IsTransformed(drawInfo.drawPlayer)) {
-                        var animData = TransformationHandler.GetCurrentTransformation(drawInfo.drawPlayer).Value.animationData;
-                        if (animData.Sparks) drawInfo.DrawDataCache.Add(LightningEffect(drawInfo.drawPlayer, drawInfo.Position, "DBZMODPORT/Dusts/LSSJ3Lightning"));
+                        var forms = TransformationHandler.GetAllCurrentForms(drawInfo.drawPlayer);
+                        if(forms.Any(x=>x.animationData != new Model.AnimationData() && x.animationData.Sparks))
+                            drawInfo.DrawDataCache.Add(LightningEffect(drawInfo.drawPlayer, drawInfo.Position, "DBZMODPORT/Dusts/LSSJ3Lightning"));
                     }
                 }
             }

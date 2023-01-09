@@ -152,7 +152,9 @@ namespace DBZGoatLib.Handlers {
             if (!transformation.condition(player))
                 return;
 
-            ClearTransformations(player);
+            if (IsTransformed(player) && !transformation.stackable)
+                ClearTransformations(player);
+
             StartTransformation(player, transformation);
         }
 
@@ -195,7 +197,6 @@ namespace DBZGoatLib.Handlers {
 
                 if (Main.dedServ || Main.netMode != NetmodeID.MultiplayerClient || player.whoAmI != Main.myPlayer)
                     return;
-                KiBar.ResetTransformationColor();
                 NetworkHelper.transSync.SendFormChanges(256, player.whoAmI, player.whoAmI, transformation.buffID, 0);
             }
         }
@@ -212,31 +213,33 @@ namespace DBZGoatLib.Handlers {
         /// <summary>
         /// Checks whether the user is transformed or not.
         /// </summary>
-        public static bool IsTransformed(Player player, bool IgnoreDBTtransformations = true, bool ignoreDBCATransformations = true) {
+        public static bool IsTransformed(Player player, bool IgnoreStackable = false) {
             foreach (var trans in Transformations) {
                 if (player.HasBuff(trans.buffID))
-                    return true;
+                    if (IgnoreStackable && trans.stackable)
+                        continue;
+                    else return true;
             }
             foreach (var ext in DBT_Transformation_Info)
             {
                 if (player.HasBuff(ext.buffID))
                     return true;
             }
-            if (!IgnoreDBTtransformations) {
-                if (ModLoader.HasMod("DBZMODPORT")) {
-                    foreach (var ext in DBTForms) {
-                        if (player.HasBuff(DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(ext).Type))
-                            return true;
-                    }
-                }
+            //if (!IgnoreDBTtransformations) {
+            //    if (ModLoader.HasMod("DBZMODPORT")) {
+            //        foreach (var ext in DBTForms) {
+            //            if (player.HasBuff(DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(ext).Type))
+            //                return true;
+            //        }
+            //    }
 
-                if (ModLoader.HasMod("dbzcalamity")) {
-                    foreach (var ext in DBCAForms) {
-                        if (player.HasBuff(DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type))
-                            return true;
-                    }
-                }
-            }
+            //    //if (ModLoader.HasMod("dbzcalamity")) {
+            //    //    foreach (var ext in DBCAForms) {
+            //    //        if (player.HasBuff(DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type))
+            //    //            return true;
+            //    //    }
+            //    //}
+            //}
             return false;
         }
 
@@ -293,7 +296,9 @@ namespace DBZGoatLib.Handlers {
         /// </summary>
         public static bool IsAnythingBut(Player player, int buffId, bool includeExternal = false) {
             foreach (var trans in Transformations) {
-                if (player.HasBuff(trans.buffID) && trans.buffID != buffId && !trans.stackable)
+                if (trans.stackable)
+                    continue;
+                if (player.HasBuff(trans.buffID) && trans.buffID != buffId)
                     return true;
             }
 
@@ -304,13 +309,13 @@ namespace DBZGoatLib.Handlers {
                 }
             }
 
-            if (ModLoader.HasMod("dbzcalamity") && includeExternal) {
-                foreach (var ext in DBCAForms) {
-                    int extType = DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type;
-                    if (player.HasBuff(extType) && extType != buffId)
-                        return true;
-                }
-            }
+            //if (ModLoader.HasMod("dbzcalamity") && includeExternal) {
+            //    foreach (var ext in DBCAForms) {
+            //        int extType = DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type;
+            //        if (player.HasBuff(extType) && extType != buffId)
+            //            return true;
+            //    }
+            //}
 
             return false;
         }
