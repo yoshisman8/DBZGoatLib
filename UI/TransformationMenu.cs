@@ -42,7 +42,94 @@ namespace DBZGoatLib.UI
         }
         public override void OnInitialize()
         {
-            BuildComponents();
+            Panel = new TransformationPanelComponent(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/TransformationUI"));
+            Panel.SetPadding(0);
+            Panel.Width.Set(360, 0f);
+            Panel.Height.Set(296, 0f);
+            Append(Panel);
+
+            PrevTreeButton = new UIElement();
+            PrevTreeButton.Width.Set(36, 0f);
+            PrevTreeButton.Height.Set(36, 0f);
+            PrevTreeButton.Left.Set(22, 0f);
+            PrevTreeButton.Top.Set(8, 0f);
+            PrevTreeButton.OnClick += PrevTree;
+            PrevTreeButton.OnMouseOver += (o, e) => { Tooltip = "Previous Transformation Tree"; };
+            PrevTreeButton.OnMouseOut += (o, e) => { Tooltip = null; };
+            Panel.Append(PrevTreeButton);
+
+            NextTreeButton = new UIElement();
+            NextTreeButton.Width.Set(36, 0f);
+            NextTreeButton.Height.Set(36, 0f);
+            NextTreeButton.Left.Set(306, 0f);
+            NextTreeButton.Top.Set(8, 0f);
+            NextTreeButton.OnClick += NextTree;
+            NextTreeButton.OnMouseOver += (o, e) => { Tooltip = "Next Transformation Tree"; };
+            NextTreeButton.OnMouseOut += (o, e) => { Tooltip = null; };
+            Panel.Append(NextTreeButton);
+
+            var Title = new UIText(transformationPanel.Name);
+            Title.Height.Set(24, 0f);
+            Title.Width.Set(200, 0f);
+            Title.Left.Set(82, 0f);
+            Title.Top.Set(14, 0f);
+            Title.OnMouseOver += (o, e) => { Tooltip = transformationPanel.Name; };
+            Title.OnMouseOut += (o, e) => { Tooltip = null; };
+
+            Panel.Append(Title);
+
+
+            MasteryBar = new UIElement();
+            MasteryBar.Left.Set(10, 0f);
+            MasteryBar.Top.Set(264, 0f);
+            MasteryBar.Width.Set(340f, 0f);
+            MasteryBar.Height.Set(12, 0f);
+            MasteryBar.OnMouseOver += MasteryBarMouseOver;
+            MasteryBar.OnMouseOut += (o, e) => { Tooltip = null; };
+
+            Panel.Append(MasteryBar);
+
+            Grid = new();
+            Grid.Left.Set(24, 0f);
+            Grid.Top.Set(50, 0f);
+            Grid.Width.Set(312, 0f);
+            Grid.Height.Set(192, 0f);
+
+            Panel.Append(Grid);
+
+            if (transformationPanel.Name == Defaults.DefaultPanel.Name)
+            {
+                foreach (var subpanel in UIHandler.Panels.Where(x => !x.Complete))
+                {
+                    foreach (var connection in subpanel.Connections)
+                    {
+                        var line = new TransConnector(connection);
+                        Connections.Add(line);
+                        Grid.Append(line);
+                    }
+                    foreach (var node in subpanel.Nodes)
+                    {
+                        var Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
+                        Nodes.Add(Button);
+                        Grid.Append(Button);
+                    }
+                }
+            }
+
+            foreach (var connection in transformationPanel.Connections)
+            {
+                var line = new TransConnector(connection);
+                Connections.Add(line);
+                Grid.Append(line);
+            }
+
+            foreach (var node in transformationPanel.Nodes)
+            {
+                var Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
+                Nodes.Add(Button);
+                Grid.Append(Button);
+            }
+
             this.IgnoresMouseInteraction = false;
         }
         public override void Update(GameTime gameTime)
@@ -51,15 +138,6 @@ namespace DBZGoatLib.UI
 
             if (!string.IsNullOrEmpty(Tooltip))
                 Main.instance.MouseText(Tooltip);
-
-            if (Dirty)
-            {
-                Nodes = new();
-                Connections = new();
-
-                Dirty = false;
-                BuildComponents();
-            }
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -67,7 +145,6 @@ namespace DBZGoatLib.UI
                 return;
             base.Draw(spriteBatch);
             DrawMasteryBar(spriteBatch);
-            
         }
 
         private void DrawMasteryBar(SpriteBatch spriteBatch)
@@ -129,97 +206,5 @@ namespace DBZGoatLib.UI
         {
             UIHandler.NextTree();
         }
-        private void BuildComponents()
-        {
-            Panel = new TransformationPanelComponent(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/TransformationUI"));
-            Panel.SetPadding(0);
-            Panel.Width.Set(360, 0f);
-            Panel.Height.Set(296, 0f);
-            Append(Panel);
-
-            PrevTreeButton = new UIElement();
-            PrevTreeButton.Width.Set(36, 0f);
-            PrevTreeButton.Height.Set(36, 0f);
-            PrevTreeButton.Left.Set(22, 0f);
-            PrevTreeButton.Top.Set(8, 0f);
-            PrevTreeButton.OnClick += PrevTree;
-            PrevTreeButton.OnMouseOver += (o, e) => { Tooltip = "Previous Transformation Tree"; };
-            PrevTreeButton.OnMouseOut += (o, e) => { Tooltip = null; };
-            Panel.Append(PrevTreeButton);
-
-            NextTreeButton = new UIElement();
-            NextTreeButton.Width.Set(36, 0f);
-            NextTreeButton.Height.Set(36, 0f);
-            NextTreeButton.Left.Set(306, 0f);
-            NextTreeButton.Top.Set(8, 0f);
-            NextTreeButton.OnClick += NextTree;
-            NextTreeButton.OnMouseOver += (o, e) => { Tooltip = "Next Transformation Tree"; };
-            NextTreeButton.OnMouseOut += (o, e) => { Tooltip = null; };
-            Panel.Append(NextTreeButton);
-
-            var Title = new UIText(transformationPanel.Name);
-            Title.Height.Set(24, 0f);
-            Title.Width.Set(200, 0f);
-            Title.Left.Set(82, 0f);
-            Title.Top.Set(14, 0f);
-            Title.OnMouseOver += (o,e) => { Tooltip = transformationPanel.Name; };
-            Title.OnMouseOut += (o, e) => { Tooltip = null; };
-
-            Panel.Append(Title);
-
-            
-            MasteryBar = new UIElement();
-            MasteryBar.Left.Set(10, 0f);
-            MasteryBar.Top.Set(264, 0f);
-            MasteryBar.Width.Set(340f, 0f);
-            MasteryBar.Height.Set(12, 0f);
-            MasteryBar.OnMouseOver += MasteryBarMouseOver;
-            MasteryBar.OnMouseOut += (o, e) => { Tooltip = null; };
-
-            Panel.Append(MasteryBar);
-
-            Grid = new();
-            Grid.Left.Set(24, 0f);
-            Grid.Top.Set(50, 0f);
-            Grid.Width.Set(312, 0f);
-            Grid.Height.Set(192, 0f);
-
-            Panel.Append(Grid);
-
-            if(transformationPanel.Name == Defaults.DefaultPanel.Name)
-            {
-                foreach(var subpanel in UIHandler.Panels.Where(x => !x.Complete))
-                {
-                    foreach (var connection in subpanel.Connections)
-                    {
-                        var line = new TransConnector(connection);
-                        Connections.Add(line);
-                        Grid.Append(line);
-                    }
-                    foreach (var node in subpanel.Nodes)
-                    {
-                        var Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
-                        Nodes.Add(Button);
-                        Grid.Append(Button);
-                    }
-                }
-            }
-
-            foreach (var connection in transformationPanel.Connections)
-            {
-                var line = new TransConnector(connection);
-                Connections.Add(line);
-                Grid.Append(line);
-            }
-
-            foreach (var node in transformationPanel.Nodes)
-            {
-                var Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
-                Nodes.Add(Button);
-                Grid.Append(Button);
-            }
-
-        }
-
     }
 }

@@ -31,7 +31,7 @@ namespace DBZGoatLib.UI
                 {
                     DBZConfig.Instance.TransMenuX = screenRatioPosition.X;
                     DBZConfig.Instance.TransMenuY = screenRatioPosition.Y;
-                    DBZConfig.Instance.Save();
+                    DBZGoatLib.SaveConfig(DBZConfig.Instance);
                 }
             }
         }

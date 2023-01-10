@@ -24,6 +24,7 @@ namespace DBZGoatLib.Handlers
         public static List<TransformationPanel> Panels { get; private set; } = new();
         public static int ActivePanel = 0;
         public static bool Dirty;
+        public static bool Loaded;
 
         internal static List<TransformationPanel> TruePanels => Panels.Where(x => x.Complete).ToList();
 
@@ -58,20 +59,20 @@ namespace DBZGoatLib.Handlers
         {
             base.Load();
 
-            if(Main.netMode != NetmodeID.Server)
-            {
-                transformationMenu = new TransformationMenu(Defaults.DefaultPanel);
-                transformationMenu.Activate();
+            //if(Main.netMode != NetmodeID.Server)
+            //{
+            //    transformationMenu = new TransformationMenu(Defaults.DefaultPanel);
+            //    transformationMenu.Activate();
 
-                _transUserInterface = new UserInterface();
-                _transUserInterface.SetState(transformationMenu);
+            //    _transUserInterface = new UserInterface();
+            //    _transUserInterface.SetState(transformationMenu);
 
-                kiBar = new KiBar();
-                kiBar.Activate();
+            //    kiBar = new KiBar();
+            //    kiBar.Activate();
 
-                _kiUserInterface = new UserInterface();
-                _kiUserInterface.SetState(kiBar);
-            }
+            //    _kiUserInterface = new UserInterface();
+            //    _kiUserInterface.SetState(kiBar);
+            //}
         }
         internal static void PrevTree()
         {
@@ -93,7 +94,7 @@ namespace DBZGoatLib.Handlers
         public override void UpdateUI(GameTime gameTime)
         {
             base.UpdateUI(gameTime);
-
+            
             if (Dirty)
             {
                 if (!TruePanels[ActivePanel].Predicate.Invoke(Main.CurrentPlayer))
@@ -101,17 +102,24 @@ namespace DBZGoatLib.Handlers
                     NextTree();
                     return;
                 }
-                transformationMenu.Remove();
-                transformationMenu = new TransformationMenu(TruePanels[ActivePanel]);
 
-                _transUserInterface.SetState(transformationMenu);
+                if (Loaded)
+                {
+                    transformationMenu?.Remove();
+                    transformationMenu = new TransformationMenu(TruePanels[ActivePanel]);
+                    transformationMenu.Activate();
 
-                kiBar = new KiBar();
-                kiBar.Activate();
+                    _transUserInterface = new UserInterface();
+                    _transUserInterface.SetState(transformationMenu);
 
-                _kiUserInterface = new UserInterface();
-                _kiUserInterface.SetState(kiBar);
+                    kiBar?.Remove();
+                    kiBar = new KiBar();
+                    kiBar.Activate();
 
+                    _kiUserInterface = new UserInterface();
+                    _kiUserInterface.SetState(kiBar);
+                }
+                
                 Dirty = false;
             }
 
@@ -131,7 +139,7 @@ namespace DBZGoatLib.Handlers
                         "DBZGoatLib: TransformationMenu", 
                         delegate 
                         { 
-                            _transUserInterface.Draw(Main.spriteBatch, new GameTime()); 
+                            _transUserInterface?.Draw(Main.spriteBatch, new GameTime()); 
                             return true; 
                         }, 
                     InterfaceScaleType.UI)
@@ -143,7 +151,7 @@ namespace DBZGoatLib.Handlers
                 layers[kiBarIndex] = new LegacyGameInterfaceLayer("DBZGoatLib: KiBar",
                     delegate
                     {
-                        _kiUserInterface.Draw(Main.spriteBatch, new GameTime());
+                        _kiUserInterface?.Draw(Main.spriteBatch, new GameTime());
                         return true;
                     },
                 InterfaceScaleType.UI);

@@ -100,6 +100,7 @@ namespace DBZGoatLib {
             if (!string.IsNullOrEmpty(SavedSelection))
                 TransformationMenu.ActiveForm = SavedSelection;
             UIHandler.Dirty = true;
+            UIHandler.Loaded = true;
 
             if (!Traited)
                 RollTraits();
@@ -132,7 +133,7 @@ namespace DBZGoatLib {
 
             Traited = true;
 
-            TransformationMenu.Dirty = true;
+            UIHandler.Dirty = true;
         }
         public void RerollTraits()
         {
@@ -149,7 +150,7 @@ namespace DBZGoatLib {
 
             rolled.IfTrait(Player);
 
-            TransformationMenu.Dirty = true;
+            UIHandler.Dirty = true;
         }
         public override void PlayerDisconnect(Player player) => TransformationHandler.ClearTransformations(player);
 

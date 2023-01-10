@@ -32,9 +32,12 @@ namespace DBZGoatLib.UI
                 {
                     DBZConfig.Instance.KiBarX = screenRatioPosition.X;
                     DBZConfig.Instance.KiBarY = screenRatioPosition.Y;
-                    DBZConfig.Instance.Save();
+                    DBZGoatLib.SaveConfig(DBZConfig.Instance);
                 }
             }
+
+            if (DBZConfig.Instance.UseNewKiBar)
+                base.DrawSelf(spriteBatch);
         }
     }
 }

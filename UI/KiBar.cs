@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -24,6 +25,8 @@ namespace DBZGoatLib.UI
         private AnimatedImage KiBarFrame;
         private KiResourceBar Bar;
         private AnimatedImage Sparks;
+        private UnderSparks UnderSparks;
+        private KiTextElement KiValues;
 
         private bool Hovering;
         private List<float> CleanAverageKi = new();
@@ -66,42 +69,87 @@ namespace DBZGoatLib.UI
             def.AddStop(1f, new Color(53, 146, 183));
 
             DefaultColor = def;
-
-            Container = new KiBarContainer(TextureAssets.MagicPixel);
-            Container.Width.Set(136, 0f);
+            Container = new KiBarContainer(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/KiBarBackground"));
+            Container.Width.Set(DBZConfig.Instance.UseNewKiBar ? 159 : 136, 0f);
             Container.Height.Set(24, 0f);
             Container.OnMouseOver += (o, e) => { Hovering = true; };
             Container.OnMouseOut += (o, e) => { Hovering = false; };
 
-            Bar = new KiResourceBar();
-            Bar.Left.Set(36, 0f);
-            Bar.Top.Set(6, 0f);
-            Bar.Height.Set(6, 0f);
-            Bar.Width.Set(90, 0f); // 90 true size
-            Bar.IgnoresMouseInteraction = true;
-            Container.Append(Bar);
+            if (DBZConfig.Instance.UseNewKiBar || !ModLoader.HasMod("DBZMODPORT"))
+            {
+                UnderSparks = new(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/Form-Under"), 4);
+                UnderSparks.Left.Set(0, 0f);
+                UnderSparks.Top.Set(4, 0f);
+                UnderSparks.Width.Set(136, 0f);
+                UnderSparks.Height.Set(96, 0f);
+                UnderSparks.IgnoresMouseInteraction = true;
+                Container.Append(UnderSparks);
 
-            KiBarFrame = new(ModContent.Request<Texture2D>("DBZMODPORT/UI/KiBar"), 4);
-            KiBarFrame.Left.Set(0, 0f);
-            KiBarFrame.Top.Set(0, 0f);
-            KiBarFrame.Width.Set(136, 0f);
-            KiBarFrame.Height.Set(96, 0f);
-            KiBarFrame.IgnoresMouseInteraction = true;
-            Container.Append(KiBarFrame);
+                Bar = new KiResourceBar();
+                Bar.Left.Set(22, 0f);
+                Bar.Top.Set(10, 0f);
+                Bar.Height.Set(4, 0f);
+                Bar.Width.Set(114, 0f); // 90 true size
+                Bar.IgnoresMouseInteraction = true;
+                Container.Append(Bar);
 
-            Sparks = new(ModContent.Request<Texture2D>("DBZMODPORT/UI/KiBarLightning"), 3);
-            Sparks.Left.Set(8  , 0f);
-            Sparks.Top.Set(-1, 0f);
-            Sparks.Width.Set(130, 0f);
-            Sparks.Height.Set(60, 0f);
-            Sparks.IgnoresMouseInteraction = true;
+
+                KiBarFrame = new(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/KiBarForeground"), 4);
+                KiBarFrame.Left.Set(0, 0f);
+                KiBarFrame.Top.Set(0, 0f);
+                KiBarFrame.Width.Set(159, 0f);
+                KiBarFrame.Height.Set(96, 0f);
+                KiBarFrame.IgnoresMouseInteraction = true;
+                Container.Append(KiBarFrame);
+
+                
+
+                Sparks = new(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/Form-Over"), 4);
+                Sparks.Left.Set(0, 0f);
+                Sparks.Top.Set(4, 0f);
+                Sparks.Width.Set(136, 0f);
+                Sparks.Height.Set(96, 0f);
+                Sparks.IgnoresMouseInteraction = true;
+            }
+            else
+            { 
+                Bar = new KiResourceBar();
+                Bar.Left.Set(36, 0f);
+                Bar.Top.Set(6, 0f);
+                Bar.Height.Set(6, 0f);
+                Bar.Width.Set(90, 0f); // 90 true size
+                Bar.IgnoresMouseInteraction = true;
+                Container.Append(Bar);
+
+                KiBarFrame = new(ModContent.Request<Texture2D>("DBZMODPORT/UI/KiBar"), 4);
+                KiBarFrame.Left.Set(0, 0f);
+                KiBarFrame.Top.Set(0, 0f);
+                KiBarFrame.Width.Set(136, 0f);
+                KiBarFrame.Height.Set(96, 0f);
+                KiBarFrame.IgnoresMouseInteraction = true;
+                Container.Append(KiBarFrame);
+
+                Sparks = new(ModContent.Request<Texture2D>("DBZMODPORT/UI/KiBarLightning"), 3);
+                Sparks.Left.Set(8, 0f);
+                Sparks.Top.Set(-1, 0f);
+                Sparks.Width.Set(130, 0f);
+                Sparks.Height.Set(60, 0f);
+                Sparks.IgnoresMouseInteraction = true;
+            }
+
+            KiValues = new("0/0");
+            KiValues.Left.Set(20, 0f);
+            KiValues.Top.Set(25, 0f);
+            KiValues.Width.Set(136, 0f);
+            Container.Append(KiValues);
 
             Append(Container);
         }
+
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            if (Hovering)
+            if (Hovering && !DBZConfig.Instance.ShowKi)
                 Main.instance.MouseText($"{(int)AverageKi}/{MaxKi}");
             var playerClass = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
             dynamic modPlayer = playerClass.GetMethod("ModPlayer").Invoke(null, new object[] { Main.CurrentPlayer });
@@ -117,7 +165,7 @@ namespace DBZGoatLib.UI
         }
         protected override void DrawChildren(SpriteBatch spriteBatch)
         {
-            if (TransformationHandler.IsTransformed(Main.CurrentPlayer))
+            if (TransformationHandler.IsTransformed(Main.CurrentPlayer, true))
             {
                 Container.Append(Sparks);
             }

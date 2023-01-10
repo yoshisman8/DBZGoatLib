@@ -9,6 +9,7 @@ using DBZGoatLib.Network;
 using DBZGoatLib.UI;
 using MonoMod.RuntimeDetour;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Config;
 using Terraria.UI;
 
 namespace DBZGoatLib
@@ -72,6 +73,16 @@ namespace DBZGoatLib
             base.PostSetupContent();
             foreach (var form in ModContent.GetContent<Transformation>())
                 form.Load();
+        }
+        internal static void SaveConfig(DBZConfig cfg)
+        {
+            MethodInfo saveMethodInfo = typeof(ConfigManager).GetMethod("Save", BindingFlags.Static | BindingFlags.NonPublic);
+            if (saveMethodInfo != null)
+            {
+                saveMethodInfo.Invoke(null, new object[] { cfg });
+                return;
+            }
+            Instance.Value.Logger.Warn("In-game SaveConfig failed, code update required.");
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI) => NetworkHelper.HandlePacket(reader, whoAmI);
 

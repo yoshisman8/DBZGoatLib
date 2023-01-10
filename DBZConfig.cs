@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using DBZGoatLib.Handlers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
@@ -29,6 +31,16 @@ namespace DBZGoatLib
         [Tooltip("The Y position of the Ki Bar.")]
         public float KiBarY { get; set; }
 
+        [Label("Show ki value underneath bar")]
+        [DefaultValue(false)]
+        [Tooltip("Constantly show the Ki values underneath the Ki Bar.")]
+        public bool ShowKi;
+
+        [Label("Use new Ki Bar")]
+        [DefaultValue(true)]
+        [Tooltip("Use the new Ki Bar sprites. Cannot be disabled if Dragon Ball Terraria is not installed.")]
+        public bool UseNewKiBar;
+
         [Header("Transformation Menu Position")]
         [Label("Position X")]
         [Tooltip("The X position of the Transformation Menu.")]
@@ -44,10 +56,11 @@ namespace DBZGoatLib
             return true;
         }
 
-        public void Save()
+        public override void OnChanged()
         {
-            Directory.CreateDirectory(Path.Combine(Main.SavePath, "ModConfigs"));
-            File.WriteAllText(Path.Combine(Main.SavePath, "ModConfigs", $"DBZGoatLib_ClientConfig.json"), JsonConvert.SerializeObject(Instance, ConfigManager.serializerSettings));
+            base.OnChanged();
+            UIHandler.Dirty = true;
         }
+        
     }
 }
