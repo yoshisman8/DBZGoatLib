@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -57,17 +58,20 @@ namespace DBZGoatLib.Handlers
         {
             base.Load();
 
-            transformationMenu = new TransformationMenu(Defaults.DefaultPanel);
-            transformationMenu.Activate();
+            if(Main.netMode != NetmodeID.Server)
+            {
+                transformationMenu = new TransformationMenu(Defaults.DefaultPanel);
+                transformationMenu.Activate();
 
-            _transUserInterface = new UserInterface();
-            _transUserInterface.SetState(transformationMenu);
+                _transUserInterface = new UserInterface();
+                _transUserInterface.SetState(transformationMenu);
 
-            kiBar = new KiBar();
-            kiBar.Activate();
+                kiBar = new KiBar();
+                kiBar.Activate();
 
-            _kiUserInterface = new UserInterface();
-            _kiUserInterface.SetState(kiBar);
+                _kiUserInterface = new UserInterface();
+                _kiUserInterface.SetState(kiBar);
+            }
         }
         internal static void PrevTree()
         {
