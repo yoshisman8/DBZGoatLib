@@ -309,6 +309,8 @@ namespace DBZGoatLib {
                     foreach (var form in transformation)
                         HandleMasteryGain(form);
                 }
+
+            SyncTraits();
         }
 
         public void HandleMasteryGain(TransformationInfo transformation) {
@@ -347,7 +349,7 @@ namespace DBZGoatLib {
 
             string trait = (string)traitField.GetValue(instance);
 
-            if(trait == "Prodigy" || trait == "Legendary")
+            if((trait == "Prodigy" || trait == "Legendary") && trait != Trait)
             {
                 var T = TraitHandler.GetTraitByName(trait);
                 if (T.HasValue)
