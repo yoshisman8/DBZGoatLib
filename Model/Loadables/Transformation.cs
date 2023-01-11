@@ -142,9 +142,9 @@ namespace DBZGoatLib.Model {
                 return;
             }
 
-            if (TransformationHandler.IsKaioken(player))
+            if (TransformationHandler.IsKaioken(player) && !Stackable())
             {
-                TransformationHandler.ClearTransformations(player);
+                TransformationHandler.EndTranformation(player, TransformationHandler.GetTransformation(Type).Value);
                 return;
             }
 
