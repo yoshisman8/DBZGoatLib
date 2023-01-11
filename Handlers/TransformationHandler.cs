@@ -201,6 +201,13 @@ namespace DBZGoatLib.Handlers {
             }
         }
 
+        internal static bool IsKaioken(Player player) 
+        {
+            var tHandler = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
+            var isKaioken = tHandler.GetMethod("IsKaioken", new Type[] { typeof(Player) });
+
+            return (bool)isKaioken.Invoke(null, new object[] { player });
+        }
         private static void StartTransformation(Player player, TransformationInfo transformation) {
             player.AddBuff(transformation.buffID, 666666, false);
             if (!string.IsNullOrEmpty(transformation.transformationText))

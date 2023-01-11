@@ -142,6 +142,12 @@ namespace DBZGoatLib.Model {
                 return;
             }
 
+            if (TransformationHandler.IsKaioken(player))
+            {
+                TransformationHandler.ClearTransformations(player);
+                return;
+            }
+
             Lighting.AddLight(player.Center + player.velocity * 8f, 0.84f, 0.59f, 0.95f);
 
             float drain = GPlayer.ModPlayer(player).GetMastery(Type) < 1f ? kiDrainRate : kiDrainRateWithMastery;
