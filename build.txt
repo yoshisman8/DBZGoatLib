@@ -1,6 +1,6 @@
 displayName = Vyklade's DBT Transformation Lib
 author = Vyklade
-version = 1.6.4
+version = 1.6.5
 modReferences = DBZMODPORT
 includeSource = false
 hideResources = true

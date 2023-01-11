@@ -335,8 +335,37 @@ namespace DBZGoatLib {
                 masteryField.SetValue(instance, Math.Min(1f, mastery + (0.00232f * MasteryMultiplier)));
 
             }
-        }
+            
 
+
+        }
+        private void SyncTraits()
+        {
+            var myPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+            var instance = myPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
+            var traitField = myPlayer.GetField("playerTrait");
+
+            string trait = (string)traitField.GetValue(instance);
+
+            if(trait == "Prodigy" || trait == "Legendary")
+            {
+                var T = TraitHandler.GetTraitByName(trait);
+                if (T.HasValue)
+                {
+                    var current = TraitHandler.GetTraitByName(Trait);
+
+                    if (current.HasValue)
+                        current.Value.IfUntrait(Player);
+
+                    Trait = T.Value.Name;
+
+                    T.Value.IfTrait(Player);
+
+                    UIHandler.Dirty = true;
+                }
+            }
+            
+        }
         public override void OnHitAnything(float x, float y, Entity victim) {
             if (victim is NPC)
                 if ((victim as NPC).type == NPCID.TargetDummy)
