@@ -434,7 +434,10 @@ namespace DBZGoatLib {
             TransformationHandler.ClearTransformations(player);
             base.OnRespawn(player);
         }
-
+        public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
+        {
+            TransformationHandler.ClearTransformations(Player);
+        }
         public void ProcessTransformationTriggers()
         {
             var transformation = FetchTransformation();
