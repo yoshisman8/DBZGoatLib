@@ -1,3 +1,9 @@
 This mod comes with a series of methods, libraries and classes meant to aid in the effort to add Super Saiyan transformations to the Dragon Ball Terraria mod.
 
 [h3][url=https://github.com/yoshisman8/DBZGoatLib]Find the source code here![/url][/h3]
+
+[h2]Special thanks to:[/h2]
+[list]
+[*] [url=https://steamcommunity.com/id/KosmicDev]KosmicShovel[/url] for code contributions. Find his work over at [url=https://discord.gg/1330studios]1330 Studios[/url]
+[*] @shifter^3#1071 over at the Terraria Ball Super discord for the Transformation Menu spriteart!
+[/list]

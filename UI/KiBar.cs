@@ -12,6 +12,7 @@ using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
+using DBZGoatLib.UI.Components;
 
 namespace DBZGoatLib.UI
 {
@@ -20,6 +21,7 @@ namespace DBZGoatLib.UI
         private static Gradient BarGradient;
         private static Gradient TransformedGradient;
         private static Gradient DefaultColor;
+        private static Color KiBlobColor;
 
         private KiBarContainer Container;
         private AnimatedImage KiBarFrame;
@@ -27,13 +29,14 @@ namespace DBZGoatLib.UI
         private AnimatedImage Sparks;
         private UnderSparks UnderSparks;
         private KiTextElement KiValues;
+        private KiBlobComponent KiBlob;
 
         private bool Hovering;
         private List<float> CleanAverageKi = new();
         public static float AverageKi = 0;
         public static int MaxKi = 1;
 
-        public static Gradient GetColor()
+        internal static Gradient GetColor()
         {
             Player player = Main.CurrentPlayer;
 
@@ -41,11 +44,13 @@ namespace DBZGoatLib.UI
             {
                 return GetTransformationColor() ?? GetTraitColor() ?? DefaultColor;
             }
-            
             else return GetTraitColor() ?? DefaultColor;
         }
-        private static Gradient GetTraitColor()
+        internal static Gradient GetTraitColor()
         {
+            if (DBZConfig.Instance.UseNewKiBar)
+                return null;
+
             var trait = TraitHandler.GetTraitByName(Main.CurrentPlayer.GetModPlayer<GPlayer>().Trait);
             if (trait.HasValue)
                 if (trait.Value.Color != null)
@@ -53,7 +58,16 @@ namespace DBZGoatLib.UI
                 else return null;
             else return null;
         }
-        private static Gradient GetTransformationColor()
+        internal static Color GetBlobColor()
+        {
+            var trait = TraitHandler.GetTraitByName(Main.CurrentPlayer.GetModPlayer<GPlayer>().Trait);
+            if (trait.HasValue)
+                if (trait.Value.Color != null)
+                    return trait.Value.Color.GetColor(0f);
+                else return DefaultColor.GetColor(0f);
+            else return DefaultColor.GetColor(0f);
+        }
+        internal static Gradient GetTransformationColor()
         {
             var transForm = TransformationHandler.GetAllCurrentForms(Main.CurrentPlayer);
             if (transForm.Any(x => x.KiBarGradient != null))
@@ -69,6 +83,8 @@ namespace DBZGoatLib.UI
             def.AddStop(1f, new Color(53, 146, 183));
 
             DefaultColor = def;
+            KiBlobColor = def.GetColor(0f);
+
             Container = new KiBarContainer(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/KiBarBackground"));
             Container.Width.Set(DBZConfig.Instance.UseNewKiBar ? 159 : 136, 0f);
             Container.Height.Set(24, 0f);
@@ -102,6 +118,13 @@ namespace DBZGoatLib.UI
                 KiBarFrame.IgnoresMouseInteraction = true;
                 Container.Append(KiBarFrame);
 
+                KiBlob = new(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/KiBarBlob"), 4);
+                KiBlob.Left.Set(0, 0f);
+                KiBlob.Top.Set(0, 0f);
+                KiBlob.Width.Set(159, 0f);
+                KiBlob.Height.Set(96, 0f);
+                KiBlob.IgnoresMouseInteraction = true;
+                Container.Append(KiBlob);
                 
 
                 Sparks = new(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/Form-Over"), 4);

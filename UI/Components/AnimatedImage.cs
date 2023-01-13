@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria.GameContent.UI.Elements;
 
-namespace DBZGoatLib.UI
+namespace DBZGoatLib.UI.Components
 {
     public class AnimatedImage : UIImage
     {
@@ -21,6 +21,7 @@ namespace DBZGoatLib.UI
         {
             frames = _frames;
             textureCache = texture;
+            Color = Color.White;
         }
 
         public override void Update(GameTime gameTime)
@@ -37,7 +38,7 @@ namespace DBZGoatLib.UI
             Rectangle rectangle = new Rectangle(0, (int)(Height.Pixels / frames) * (int)(frameCounter / 5), (int)Width.Pixels, (int)(Height.Pixels / frames));
             Vector2 position = new Vector2(dimensions.X, dimensions.Y);
 
-            spriteBatch.Draw(textureCache.Value, position, rectangle, Color.White);
+            spriteBatch.Draw(textureCache.Value, position, rectangle, Color);
         }
     }
 }

@@ -9,7 +9,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.UI;
 
-namespace DBZGoatLib.UI
+namespace DBZGoatLib.UI.Components
 {
     public class KiResourceBar : UIElement
     {

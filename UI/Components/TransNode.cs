@@ -14,7 +14,7 @@ using ReLogic.Content;
 using DBZGoatLib.Handlers;
 using Terraria.ID;
 
-namespace DBZGoatLib.UI
+namespace DBZGoatLib.UI.Components
 {
     public class TransNode : UIImageButton
     {

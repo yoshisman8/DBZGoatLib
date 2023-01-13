@@ -44,7 +44,7 @@ namespace DBZGoatLib.Model
             new TransformationChain("ASSJBuff", true, "USSJBuff", "SSJ1Buff"),
             new TransformationChain("USSJBuff", true, null, "ASSJBuff"),
             new TransformationChain("SSJ1Buff", false, "SSJ2Buff"),
-            new TransformationChain("SSJ1Buff", false, "LSSJ1Buff"),
+            new TransformationChain("SSJ1Buff", false, "LSSJBuff"),
             new TransformationChain("SSJ2Buff", false, "SSJ3Buff", "SSJ1Buff"),
             new TransformationChain("SSJ3Buff", false, "SSJGBuff", "SSJ2Buff"),
             new TransformationChain("LSSJBuff", false, "LSSJ2Buff","SSJ1Buff"),
@@ -65,19 +65,19 @@ namespace DBZGoatLib.Model
         {
             dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { player });
 
-            return (bool)modPlayer.ssj2Achieved;
+            return (bool)modPlayer.ssj2Achieved && !(bool)modPlayer.IsPlayerLegendary();
         }
         public static bool SSJ3Condition(Player player)
         {
             dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { player });
 
-            return (bool)modPlayer.ssj3Achieved;
+            return (bool)modPlayer.ssj3Achieved && !(bool)modPlayer.IsPlayerLegendary();
         }
         public static bool SSJGCondition(Player player)
         {
             dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { player });
 
-            return (bool)modPlayer.ssjgAchieved;
+            return (bool)modPlayer.ssjgAchieved && !(bool)modPlayer.IsPlayerLegendary();
         }
         public static bool SSJLineDiscovered(Player player)
         {
@@ -119,13 +119,13 @@ namespace DBZGoatLib.Model
         {
             dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { player });
 
-            return (bool)modPlayer.ssjbAchieved;
+            return (bool)modPlayer.ssjbAchieved && !(bool)modPlayer.IsPlayerLegendary();
         }
         public static bool SSJRCondition(Player player)
         {
             dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { player });
 
-            return (bool)modPlayer.ssjrAchieved;
+            return (bool)modPlayer.ssjrAchieved && !(bool)modPlayer.IsPlayerLegendary();
         }
 
         public static float GetMastery(Player player, string buffName)

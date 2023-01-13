@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria.GameContent.UI.Elements;
 
-namespace DBZGoatLib.UI
+namespace DBZGoatLib.UI.Components
 {
     public class KiTextElement : UIText
     {

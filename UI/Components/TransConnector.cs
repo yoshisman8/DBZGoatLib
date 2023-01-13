@@ -14,7 +14,7 @@ using ReLogic.Content;
 using DBZGoatLib.Handlers;
 using Terraria.GameContent;
 
-namespace DBZGoatLib.UI
+namespace DBZGoatLib.UI.Components
 {
     public class TransConnector : UIElement
     {

@@ -10,7 +10,7 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace DBZGoatLib.UI
+namespace DBZGoatLib.UI.Components
 {
 	public class DragableUIPanel : UIImage
 	{

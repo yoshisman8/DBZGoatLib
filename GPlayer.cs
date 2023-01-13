@@ -19,15 +19,12 @@ using Terraria.Utilities;
 namespace DBZGoatLib {
 
     public class GPlayer : ModPlayer {
-        public int lightningFrameTimer;
-        public int lightning3FrameCount = 9;
-        public int lightning3FrameIndex;
-        public int lightning3FrameTime;
-        public int lightning3FrameTimer = 6;
-
+        #region Mastery Dictionaries
         public readonly Dictionary<int, float> Masteries = new();
         public readonly Dictionary<int, bool> MasteryMaxed = new();
+        #endregion
 
+        #region Animation Variables
         internal KeyValuePair<uint, ActiveSound> auraSoundInfo;
         internal int playerIndexWithLocalAudio;
         internal int auraSoundtimer = 0;
@@ -35,17 +32,32 @@ namespace DBZGoatLib {
         internal int auraCurrentFrame = 0;
         internal AnimationData currentAnimation;
         internal AnimationData previousAnimation;
+        public int lightningFrameTimer;
+        public int lightning3FrameCount = 9;
+        public int lightning3FrameIndex;
+        public int lightning3FrameTime;
+        public int lightning3FrameTimer = 6;
+        #endregion
 
+        #region Timers
         internal DateTime? LastMasteryTick;
         internal DateTime? LastHitEnemy;
         internal DateTime? LastHit;
+        #endregion
 
+        #region Trait Variables
         public bool Traited;
         public string Trait;
         public float MasteryMultiplier = 1f;
+        #endregion
 
+        #region Internal Variables
         internal string SavedTree;
         internal string SavedSelection;
+        internal bool isCharging;
+        #endregion
+
+        #region Data Handling
         public override void SaveData(TagCompound tag) {
             foreach (var trans in TransformationHandler.Transformations) {
                 if (Masteries.TryGetValue(trans.buffID, out float mastery) && !tag.ContainsKey($"DBZGoatLib_{trans.buffKeyName}")) {
@@ -60,7 +72,6 @@ namespace DBZGoatLib {
             tag.Add("DBZGoatLib_Trait", Trait);
             tag.Add("DBZGoatLib_Traited", Traited);
         }
-
         public override void LoadData(TagCompound tag) {
             foreach (var trans in TransformationHandler.Transformations) {
                 if (tag.ContainsKey($"DBZGoatLib_{trans.buffKeyName}")) {
@@ -111,6 +122,41 @@ namespace DBZGoatLib {
                     traitInfo.Value.IfTrait(Player);
             }
         }
+        #endregion
+
+        public static GPlayer ModPlayer(Player player) => player.GetModPlayer<GPlayer>();
+        public bool IsCharging()
+        {
+            if (ModLoader.HasMod("DBZMODPORT"))
+            {
+                dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { Player });
+                return (bool)modPlayer.isCharging;
+            }
+            else
+            {
+                return isCharging;
+            }
+        }
+        public override void PlayerDisconnect(Player player) 
+            => TransformationHandler.ClearTransformations(player);
+        public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource) 
+            => TransformationHandler.ClearTransformations(Player);
+        public override void OnRespawn(Player player) 
+            => TransformationHandler.ClearTransformations(player);
+        public override void ProcessTriggers(TriggersSet triggersSet)
+        {
+            if (DBZGoatLib.OpenMenu.JustPressed)
+                TransformationMenu.Visible ^= true;
+            DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransMenu")).GetField("menuvisible").SetValue(null, false);
+            ProcessTransformationTriggers();
+
+            if (TransformationHandler.EnergyChargeKey.JustPressed && (bool)DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("ConfigModel")).GetField("isChargeToggled").GetValue(null))
+            {
+                isCharging ^= true;
+            }
+        }
+
+        #region Trait Handling
         internal void ClearDBTTrait()
         {
             var MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
@@ -127,35 +173,62 @@ namespace DBZGoatLib {
 
             var rolled = TraitHandler.RollTrait();
 
-            Trait = rolled.Name;
-
-            rolled.IfTrait(Player);
-
-            Traited = true;
-
-            UIHandler.Dirty = true;
+            SetTrait(rolled);
         }
         public void RerollTraits()
         {
             ClearDBTTrait();
 
-            var current = TraitHandler.GetTraitByName(Trait);
-
-            if (current.HasValue)
-                current.Value.IfUntrait(Player);
-
             var rolled = TraitHandler.RollTrait(false, Trait);
 
-            Trait = rolled.Name;
+            SetTrait(rolled);
+        }
+        private void SyncTraits()
+        {
+            var myPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+            var instance = myPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
+            var traitField = myPlayer.GetField("playerTrait");
 
-            rolled.IfTrait(Player);
+            string trait = (string)traitField.GetValue(instance);
+
+            if ((trait == "Prodigy" || trait == "Legendary") && trait != Trait)
+            {
+                var T = TraitHandler.GetTraitByName(trait);
+                if (T.HasValue)
+                {
+                    var current = TraitHandler.GetTraitByName(Trait);
+
+                    if (current.HasValue)
+                        current.Value.IfUntrait(Player);
+
+                    Trait = T.Value.Name;
+
+                    T.Value.IfTrait(Player);
+
+                    UIHandler.Dirty = true;
+                }
+            }
+
+        }
+        public void SetTrait(TraitInfo trait)
+        {
+            var current = TraitHandler.GetTraitByName(Trait);
+
+            current?.IfUntrait?.Invoke(Player);
+
+            Trait = trait.Name;
+
+            trait.IfTrait?.Invoke(Player);
 
             UIHandler.Dirty = true;
         }
-        public override void PlayerDisconnect(Player player) => TransformationHandler.ClearTransformations(player);
+        #endregion
 
-        public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo) {
-            if (TransformationHandler.IsTransformed(drawInfo.drawPlayer)) {
+        #region Animation Handling
+        public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
+        {
+            if (TransformationHandler.IsTransformed(drawInfo.drawPlayer))
+            {
                 var pClass = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
                 var modPlayer = pClass.GetMethod("ModPlayer").Invoke(null, new object[] { drawInfo.drawPlayer });
 
@@ -182,22 +255,27 @@ namespace DBZGoatLib {
                     {
                         drawInfo.drawPlayer.head = 0;
                     }
-                }  
+                }
             }
         }
-        public override void PreUpdateMovement() {
-            if (TransformationHandler.IsTransformed(Player)) {
+        public override void PreUpdateMovement()
+        {
+            if (TransformationHandler.IsTransformed(Player))
+            {
                 var forms = TransformationHandler.GetCurrentTransformation(Player) ?? TransformationHandler.GetCurrentStackedTransformation(Player);
 
                 currentAnimation = forms.Value.animationData;
 
-                if (!currentAnimation.Equals(previousAnimation)) {
+                if (!currentAnimation.Equals(previousAnimation))
+                {
                     auraSoundInfo = SoundHandler.KillTrackedSound(auraSoundInfo);
                     HandleAuraStartupSound(currentAnimation);
                     auraSoundtimer = 0;
                     auraFrameTimer = 0;
                 }
-            } else {
+            }
+            else
+            {
                 SoundHandler.KillTrackedSound(auraSoundInfo);
                 currentAnimation = new AnimationData();
             }
@@ -205,9 +283,101 @@ namespace DBZGoatLib {
             HandleAuraLoopSound(currentAnimation);
             IncrementAuraFrameTimers(currentAnimation.Aura);
         }
+        public void HandleAuraLoopSound(AnimationData data)
+        {
+            if (data.Sound.Equals(new SoundData()))
+                return;
+            if (data.Sound.LoopSoundDuration <= 0 || string.IsNullOrEmpty(data.Sound.LoopAudioPath))
+                return;
+            if (SoundHandler.ShouldPlayPlayerAudio(Player, true))
+            {
+                if (auraSoundtimer == 0)
+                    auraSoundInfo = SoundHandler.PlaySound(data.Sound.LoopAudioPath, Player, 0.7f);
+                auraSoundtimer++;
+                if (auraSoundtimer >= data.Sound.LoopSoundDuration)
+                    auraSoundtimer = 0;
+            }
+            SoundHandler.UpdateTrackedSound(auraSoundInfo, Player.position);
+        }
+        public void HandleAuraStartupSound(AnimationData data)
+        {
+            if (data.Equals(new AnimationData()))
+                return;
+            if (data.Sound.Equals(new SoundData()))
+                return;
+            if (string.IsNullOrEmpty(data.Sound.StartAudioPath))
+                return;
+            SoundHandler.PlaySound(data.Sound.StartAudioPath, Player, 0.7f, 0.1f);
+        }
+        public void IncrementAuraFrameTimers(AuraData aura)
+        {
+            if (aura.Equals(new AuraData()))
+                return;
+            dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { Player });
+            if (IsCharging())
+                ++auraFrameTimer;
+            ++auraFrameTimer;
+            if (auraFrameTimer >= 3)
+            {
+                auraFrameTimer = 0;
+                ++auraCurrentFrame;
+            }
+            if (auraCurrentFrame < aura.Frames)
+                return;
+            auraCurrentFrame = 0;
+        }
+        public override void PreUpdate()
+        {
+            var pClass = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+            var modPlayer = pClass.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
 
-        public static GPlayer ModPlayer(Player player) => player.GetModPlayer<GPlayer>();
+            bool value = (bool)pClass.GetField("isCharging").GetValue(modPlayer);
 
+            if (isCharging != value)
+                pClass.GetField("isCharging").SetValue(modPlayer, isCharging);
+        }
+        public override void PostUpdate()
+        {
+            if (TransformationHandler.IsTransformed(Player))
+            {
+                if (TransformationHandler.GetAllCurrentForms(Player).Any(x => x.animationData.Sparks))
+                {
+                    lightning3FrameTime++;
+                }
+            }
+            if (lightning3FrameTime >= lightning3FrameTimer)
+            {
+                lightning3FrameTime = 0;
+                lightning3FrameIndex++;
+                if (lightning3FrameIndex >= lightning3FrameCount)
+                {
+                    lightning3FrameIndex = 0;
+                }
+            }
+            if (lightningFrameTimer >= 15)
+            {
+                lightningFrameTimer = 0;
+            }
+
+            if (!TransformationHandler.IsTransformed(Player))
+                LastMasteryTick = null;
+            if (!LastMasteryTick.HasValue && TransformationHandler.IsTransformed(Player))
+                LastMasteryTick = DateTime.Now;
+            if (LastMasteryTick.HasValue && TransformationHandler.IsTransformed(Player))
+                if ((DateTime.Now - LastMasteryTick.Value).TotalSeconds >= 1)
+                {
+                    LastMasteryTick = DateTime.Now;
+                    var transformation = TransformationHandler.GetAllCurrentForms(Player);
+
+                    foreach (var form in transformation)
+                        HandleMasteryGain(form);
+                }
+
+            SyncTraits();
+        }
+        #endregion
+
+        #region Mastery Handling
         /// <summary>
         /// Gets the player's mastery. Only works with GoatLib transformations.
         /// </summary>
@@ -238,81 +408,6 @@ namespace DBZGoatLib {
             }
             return 0f;
         }
-        
-        public void HandleAuraLoopSound(AnimationData data) {
-            if (data.Sound.Equals(new SoundData()))
-                return;
-            if (data.Sound.LoopSoundDuration <= 0 || string.IsNullOrEmpty(data.Sound.LoopAudioPath))
-                return;
-            if (SoundHandler.ShouldPlayPlayerAudio(Player, true)) {
-                if (auraSoundtimer == 0)
-                    auraSoundInfo = SoundHandler.PlaySound(data.Sound.LoopAudioPath, Player, 0.7f);
-                auraSoundtimer++;
-                if (auraSoundtimer >= data.Sound.LoopSoundDuration)
-                    auraSoundtimer = 0;
-            }
-            SoundHandler.UpdateTrackedSound(auraSoundInfo, Player.position);
-        }
-
-        public void HandleAuraStartupSound(AnimationData data) {
-            if (data.Equals(new AnimationData()))
-                return;
-            if (data.Sound.Equals(new SoundData()))
-                return;
-            if (string.IsNullOrEmpty(data.Sound.StartAudioPath))
-                return;
-            SoundHandler.PlaySound(data.Sound.StartAudioPath, Player, 0.7f, 0.1f);
-        }
-
-        public void IncrementAuraFrameTimers(AuraData aura) {
-            if (aura.Equals(new AuraData()))
-                return;
-            dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { Player });
-            if (modPlayer.isCharging)
-                ++auraFrameTimer;
-            ++auraFrameTimer;
-            if (auraFrameTimer >= 3) {
-                auraFrameTimer = 0;
-                ++auraCurrentFrame;
-            }
-            if (auraCurrentFrame < aura.Frames)
-                return;
-            auraCurrentFrame = 0;
-        }
-
-        public override void PostUpdate() {
-            if (TransformationHandler.IsTransformed(Player)) {
-                if (TransformationHandler.GetAllCurrentForms(Player).Any(x=>x.animationData.Sparks)) {
-                    lightning3FrameTime++;
-                }
-            }
-            if (lightning3FrameTime >= lightning3FrameTimer) {
-                lightning3FrameTime = 0;
-                lightning3FrameIndex++;
-                if (lightning3FrameIndex >= lightning3FrameCount) {
-                    lightning3FrameIndex = 0;
-                }
-            }
-            if (lightningFrameTimer >= 15) {
-                lightningFrameTimer = 0;
-            }
-
-            if (!TransformationHandler.IsTransformed(Player))
-                LastMasteryTick = null;
-            if (!LastMasteryTick.HasValue && TransformationHandler.IsTransformed(Player))
-                LastMasteryTick = DateTime.Now;
-            if (LastMasteryTick.HasValue && TransformationHandler.IsTransformed(Player))
-                if ((DateTime.Now - LastMasteryTick.Value).TotalSeconds >= 1) {
-                    LastMasteryTick = DateTime.Now;
-                    var transformation = TransformationHandler.GetAllCurrentForms(Player);
-
-                    foreach (var form in transformation)
-                        HandleMasteryGain(form);
-                }
-
-            SyncTraits();
-        }
-
         public void HandleMasteryGain(TransformationInfo transformation) {
             if (Masteries.TryGetValue(transformation.buffID, out float value)) {
                 if (value >= 1f) {
@@ -341,33 +436,6 @@ namespace DBZGoatLib {
 
 
         }
-        private void SyncTraits()
-        {
-            var myPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
-            var instance = myPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Player });
-            var traitField = myPlayer.GetField("playerTrait");
-
-            string trait = (string)traitField.GetValue(instance);
-
-            if((trait == "Prodigy" || trait == "Legendary") && trait != Trait)
-            {
-                var T = TraitHandler.GetTraitByName(trait);
-                if (T.HasValue)
-                {
-                    var current = TraitHandler.GetTraitByName(Trait);
-
-                    if (current.HasValue)
-                        current.Value.IfUntrait(Player);
-
-                    Trait = T.Value.Name;
-
-                    T.Value.IfTrait(Player);
-
-                    UIHandler.Dirty = true;
-                }
-            }
-            
-        }
         public override void OnHitAnything(float x, float y, Entity victim) {
             if (victim is NPC)
                 if ((victim as NPC).type == NPCID.TargetDummy)
@@ -386,7 +454,6 @@ namespace DBZGoatLib {
             foreach (var form in transformation)
                 HandleMasteryGain(form);
         }
-
         public override void OnHitByNPC(NPC npc, int damage, bool crit) {
             if (!TransformationHandler.IsTransformed(Player))
                 return;
@@ -403,7 +470,6 @@ namespace DBZGoatLib {
             foreach (var form in transformation)
                 HandleMasteryGain(form);
         }
-
         public override void OnHitByProjectile(Projectile proj, int damage, bool crit) {
             if (!TransformationHandler.IsTransformed(Player))
                 return;
@@ -420,24 +486,9 @@ namespace DBZGoatLib {
             foreach (var form in transformation)
                 HandleMasteryGain(form);
         }
+        #endregion
 
-        public override void ProcessTriggers(TriggersSet triggersSet)
-        {
-            if (DBZGoatLib.OpenMenu.JustPressed)
-                TransformationMenu.Visible ^= true;
-            DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransMenu")).GetField("menuvisible").SetValue(null, false);
-            ProcessTransformationTriggers();
-        }
-
-        public override void OnRespawn(Player player)
-        {
-            TransformationHandler.ClearTransformations(player);
-            base.OnRespawn(player);
-        }
-        public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
-        {
-            TransformationHandler.ClearTransformations(Player);
-        }
+        #region Tansformation Handling
         public void ProcessTransformationTriggers()
         {
             var transformation = FetchTransformation();
@@ -459,11 +510,17 @@ namespace DBZGoatLib {
                         return null;
 
                     var chain = TransformationHandler.GetChain(current.Value, TransformationHandler.EnergyChargeKey.Current);
-                    if (!chain.HasValue)
-                        return null;
-                    if (string.IsNullOrEmpty(chain.Value.NextTransformationBuffKeyName))
-                        return null;
-                    return TransformationHandler.GetTransformation(chain.Value.NextTransformationBuffKeyName);
+                    foreach (var C in chain)
+                    {
+                        if (string.IsNullOrEmpty(C.NextTransformationBuffKeyName))
+                            continue;
+                        var next = TransformationHandler.GetTransformation(C.NextTransformationBuffKeyName);
+                        if (!next.HasValue)
+                            continue;
+                        if (next.Value.condition.Invoke(Player))
+                            return next;
+                    }
+                    return null;
                 }
                 else
                 {
@@ -472,21 +529,35 @@ namespace DBZGoatLib {
             }
             else if (TransformationHandler.PowerDownKey.JustPressed)
             {
-                if (TransformationHandler.IsTransformed(Player, true))
+                if (TransformationHandler.IsTransformed(Player, true) && TransformationHandler.EnergyChargeKey.Current)
                 {
                     var current = TransformationHandler.GetCurrentTransformation(Player);
                     if (!current.HasValue)
                         return null;
 
-                    if (current.Value.buffKeyName == TransformationMenu.ActiveForm)
-                        return null;
-
                     var chain = TransformationHandler.GetChain(current.Value, TransformationHandler.EnergyChargeKey.Current);
-                    if (!chain.HasValue)
-                        return null;
-                    if (string.IsNullOrEmpty(chain.Value.PreviousTransformationBuffKeyName))
-                        return null;
-                    return TransformationHandler.GetTransformation(chain.Value.PreviousTransformationBuffKeyName);
+                    foreach (var C in chain)
+                    {
+                        if (string.IsNullOrEmpty(C.PreviousTransformationBuffKeyName))
+                            continue;
+                        var prev = TransformationHandler.GetTransformation(C.PreviousTransformationBuffKeyName);
+                        if (!prev.HasValue)
+                            continue;
+                        if (prev.Value.condition(Player))
+                            return prev;
+                    }
+                    var chain2 = TransformationHandler.GetChain(current.Value);
+                    foreach (var C in chain)
+                    {
+                        if (string.IsNullOrEmpty(C.PreviousTransformationBuffKeyName))
+                            continue;
+                        var prev = TransformationHandler.GetTransformation(C.PreviousTransformationBuffKeyName);
+                        if (!prev.HasValue)
+                            continue;
+                        if (prev.Value.condition(Player))
+                            return prev;
+                    }
+                    return null;
                 }
                 else
                     return null;
@@ -494,5 +565,6 @@ namespace DBZGoatLib {
             else
                 return null;
         }
+        #endregion
     }
 }

@@ -12,6 +12,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria;
 using DBZGoatLib.Handlers;
 using Terraria.GameContent;
+using DBZGoatLib.UI.Components;
 
 namespace DBZGoatLib.UI
 {
@@ -24,12 +25,16 @@ namespace DBZGoatLib.UI
         public static bool Visible;
         public static bool Dirty;
         public static string Tooltip;
+        public static bool InfoVisible;
+        public static bool Transitioning;
 
         public DragableUIPanel Panel;
+        public InfoPanelComponent InfoPanel;
         public UIElement Grid;
         public UIElement MasteryBar;
         public UIElement PrevTreeButton;
         public UIElement NextTreeButton;
+        public UIElement InfoButton;
         public List<TransConnector> Connections = new();
         public List<TransNode> Nodes = new();
 
@@ -47,6 +52,13 @@ namespace DBZGoatLib.UI
             Panel.Width.Set(360, 0f);
             Panel.Height.Set(296, 0f);
             Append(Panel);
+            
+            InfoPanel = new(ModContent.Request<Texture2D>("DBZGoatLib/Assets/UI/StatPanel"));
+            InfoPanel.Width.Set(228, 0f);
+            InfoPanel.Height.Set(296, 0f);
+            InfoPanel.Left.Set(348, 0f);
+            InfoPanel.Top.Set(0, 0);
+            Panel.Append(InfoPanel);
 
             PrevTreeButton = new UIElement();
             PrevTreeButton.Width.Set(36, 0f);
@@ -68,6 +80,16 @@ namespace DBZGoatLib.UI
             NextTreeButton.OnMouseOut += (o, e) => { Tooltip = null; };
             Panel.Append(NextTreeButton);
 
+            InfoButton = new();
+            InfoButton.Width.Set(36, 0f);
+            InfoButton.Height.Set(36, 0f);
+            InfoButton.Left.Set(306, 0);
+            InfoButton.Top.Set(252, 0);
+            InfoButton.OnClick += (o, e) => { Transitioning = true; InfoVisible ^= true; };
+            InfoButton.OnMouseOver += (s, e) => { Tooltip = "Ki Class statistics."; };
+            InfoButton.OnMouseOut += (o, e) => { Tooltip = null; };
+            Panel.Append(InfoButton);
+
             var Title = new UIText(transformationPanel.Name);
             Title.Height.Set(24, 0f);
             Title.Width.Set(200, 0f);
@@ -82,7 +104,7 @@ namespace DBZGoatLib.UI
             MasteryBar = new UIElement();
             MasteryBar.Left.Set(10, 0f);
             MasteryBar.Top.Set(264, 0f);
-            MasteryBar.Width.Set(340f, 0f);
+            MasteryBar.Width.Set(292, 0f);
             MasteryBar.Height.Set(12, 0f);
             MasteryBar.OnMouseOver += MasteryBarMouseOver;
             MasteryBar.OnMouseOut += (o, e) => { Tooltip = null; };

@@ -38,11 +38,22 @@ namespace DBZGoatLib.Handlers {
             {
                 List<TransformationInfo> list = new();
                 foreach (var buffName in DBTForms)
-                    list.Add(new TransformationInfo(DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(buffName).Type, buffName, false, Defaults.FormNames[buffName], Defaults.FormColors[buffName], null, null, null, new AnimationData(),Defaults.GetFormKiBar(buffName)));
+                    list.Add(new TransformationInfo(DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(buffName).Type, buffName, false, Defaults.FormNames[buffName], Defaults.FormColors[buffName], (p) => { return DBTFormCheck(buffName, p); }, null, null, new AnimationData(),Defaults.GetFormKiBar(buffName)));
                 return list.ToArray();
             }
         }
-        
+
+        private static bool DBTFormCheck(string BuffName, Player player)
+        {
+            dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { player });
+
+            if(BuffName == "SSJ2Buff")
+                return !(bool)modPlayer.IsPlayerLegendary();
+            if (BuffName == "LSSJBuff")
+                return (bool)modPlayer.lssjAchieved && (bool)modPlayer.IsPlayerLegendary();
+            return true;
+        }
+
         /// <summary>
         /// The Transform keybind registered by DBT.
         /// </summary>
@@ -332,12 +343,14 @@ namespace DBZGoatLib.Handlers {
         /// </summary>
         /// <param name="transformation">Transformation Info to search for.</param>
         /// <param name="Charge">Whether to search for chains which require the charge keybind to be held.</param>
-        /// <returns>Transformation Chain, or null if none is found.</returns>
-        public static TransformationChain? GetChain(TransformationInfo transformation, bool Charge = false)
+        /// <returns>Array of matching transformation chains. Array is empty if non are found.</returns>
+        public static TransformationChain[] GetChain(TransformationInfo transformation, bool Charge = false)
         {
-            if (!TransformationChains.Any(x => x.TransformationBuffKeyName == transformation.buffKeyName && x.Charging == Charge))
-                return null;
-            else return TransformationChains.First(x => x.TransformationBuffKeyName == transformation.buffKeyName && x.Charging == Charge);
+            List<TransformationChain> chains = new();
+            foreach (var c in TransformationChains)
+                if(c.TransformationBuffKeyName == transformation.buffKeyName && c.Charging == Charge)
+                    chains.Add(c);
+            return chains.ToArray();
         }
     }
 }

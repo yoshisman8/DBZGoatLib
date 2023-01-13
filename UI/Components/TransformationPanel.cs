@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 
-namespace DBZGoatLib.UI
+namespace DBZGoatLib.UI.Components
 {
     public class TransformationPanelComponent : DragableUIPanel
     {
