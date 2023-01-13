@@ -15,12 +15,12 @@ using Terraria.ModLoader;
 
 namespace DBZGoatLib.Layers {
 
-    public class AuraLayer : PlayerDrawLayer {
+    public class StackingAuraLayer : PlayerDrawLayer {
 
         public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => true;
-
+        public override Transformation Transform => PlayerDrawLayers.TorsoGroup;
         public override Position GetDefaultPosition() {
-            return new AfterParent(PlayerDrawLayers.Torso);
+            return new BeforeParent(PlayerDrawLayers.Torso);
         }
 
         protected override void Draw(ref PlayerDrawSet drawInfo) {
@@ -32,17 +32,10 @@ namespace DBZGoatLib.Layers {
             if (TransformationHandler.IsTransformed(drawInfo.drawPlayer)) {
                 var forms = TransformationHandler.GetAllCurrentForms(drawInfo.drawPlayer);
 
-                //foreach (var data in forms.Where(x => x.stackable).Select(x => x.animationData)) {
-                //    if (data.Aura.Equals(new AuraData()))
-                //        continue;
-                //    DrawAura(modPlayer, data.Aura, TransformationHandler.IsTransformed(drawInfo.drawPlayer, true) ? 1.5f : 1f);
-                //    Lighting.AddLight(drawInfo.drawPlayer.Center + drawInfo.drawPlayer.velocity * 8f, data.Aura.Color.R / 100, data.Aura.Color.G / 100, data.Aura.Color.B / 100);
-                //}
-                foreach (var data in forms.Where(x => !x.stackable).Select(x => x.animationData))
-                {
+                foreach (var data in forms.Where(x => x.stackable).Select(x => x.animationData)) {
                     if (data.Aura.Equals(new AuraData()))
                         continue;
-                    DrawAura(modPlayer, data.Aura);
+                    DrawAura(modPlayer, data.Aura, TransformationHandler.IsTransformed(drawInfo.drawPlayer, true) ? 1.5f : 1f);
                     Lighting.AddLight(drawInfo.drawPlayer.Center + drawInfo.drawPlayer.velocity * 8f, data.Aura.Color.R / 100, data.Aura.Color.G / 100, data.Aura.Color.B / 100);
                 }
             }
@@ -51,7 +44,7 @@ namespace DBZGoatLib.Layers {
         public static void DrawAura(GPlayer modPlayer, AuraData aura, float auraScale = 1f) {
             Texture2D texture = aura.GetTexture();
 
-            Rectangle rectangle = new Rectangle(0, aura.GetHeight() * modPlayer.auraCurrentFrame, texture.Width, aura.GetHeight());
+            Rectangle rectangle = new Rectangle(0, aura.GetHeight() * modPlayer.techniqueCurrentFrame, texture.Width, aura.GetHeight());
             var samplerState = Main.DefaultSamplerState;
             if (modPlayer.Player.mount.Active)
                 samplerState = LegacyPlayerRenderer.MountedSamplerState;

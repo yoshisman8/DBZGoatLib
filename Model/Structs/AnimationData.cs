@@ -104,12 +104,12 @@ namespace DBZGoatLib.Model {
 
         public int GetWidth() => GetTexture().Width;
 
-        public int GetAuraOffsetY(GPlayer modPlayer) => (int)(0.0 - ((double)(GetHeight() / 2) * 1f - modPlayer.Player.height * 0.600000023841858));
+        public int GetAuraOffsetY(GPlayer modPlayer, float scale) => (int)(0.0 - ((double)(GetHeight() / 2) * scale - modPlayer.Player.height * 0.600000023841858));
 
-        public Tuple<float, Vector2> GetAuraRotationAndPosition(GPlayer modPlayer) {
+        public Tuple<float, Vector2> GetAuraRotationAndPosition(GPlayer modPlayer, float auraScale) {
             bool flag = (double)Math.Abs(modPlayer.Player.velocity.X) <= 6.0 && (double)Math.Abs(modPlayer.Player.velocity.Y) <= 6.0;
             Vector2 zero = Vector2.Zero;
-            int auraOffsetY = GetAuraOffsetY(modPlayer);
+            int auraOffsetY = GetAuraOffsetY(modPlayer, auraScale);
             float num1;
             Vector2 vector2;
 

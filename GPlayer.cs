@@ -26,12 +26,18 @@ namespace DBZGoatLib {
 
         #region Animation Variables
         internal KeyValuePair<uint, ActiveSound> auraSoundInfo;
+        internal KeyValuePair<uint, ActiveSound> techniqueSoundInfo;
         internal int playerIndexWithLocalAudio;
         internal int auraSoundtimer = 0;
-        internal int auraFrameTimer = 0;
+        internal int techniqueSoundTimer = 0;
+        internal int formAuraFrameTimer = 0;
+        internal int techniqueAuraFrameTimer = 0;
         internal int auraCurrentFrame = 0;
-        internal AnimationData currentAnimation;
-        internal AnimationData previousAnimation;
+        internal int techniqueCurrentFrame = 0;
+        internal AnimationData? currentForm;
+        internal AnimationData? previousFrom;
+        internal AnimationData? currentTechnique;
+        internal AnimationData? previousTechnique;
         public int lightningFrameTimer;
         public int lightning3FrameCount = 9;
         public int lightning3FrameIndex;
@@ -262,42 +268,98 @@ namespace DBZGoatLib {
         {
             if (TransformationHandler.IsTransformed(Player))
             {
-                var forms = TransformationHandler.GetCurrentTransformation(Player) ?? TransformationHandler.GetCurrentStackedTransformation(Player);
+                var form = TransformationHandler.GetCurrentTransformation(Player);
+                var technique = TransformationHandler.GetCurrentStackedTransformation(Player);
 
-                currentAnimation = forms.Value.animationData;
+                currentForm = form?.animationData;
+                currentTechnique = technique?.animationData;
 
-                if (!currentAnimation.Equals(previousAnimation))
+                if(currentForm.HasValue)
                 {
-                    auraSoundInfo = SoundHandler.KillTrackedSound(auraSoundInfo);
-                    HandleAuraStartupSound(currentAnimation);
-                    auraSoundtimer = 0;
-                    auraFrameTimer = 0;
+                    if(currentForm != previousFrom)
+                    {
+                        auraSoundInfo = SoundHandler.KillTrackedSound(auraSoundInfo);
+                        HandleAuraStartupSound(currentForm.Value);
+                        auraSoundtimer = 0;
+                        formAuraFrameTimer = 0;
+                    }
+                }
+                else
+                {
+                    SoundHandler.KillTrackedSound(auraSoundInfo);
+                    currentForm = null;
+                }
+
+                if (currentTechnique.HasValue)
+                {
+                    if (currentTechnique != previousTechnique)
+                    {
+                        techniqueSoundInfo = SoundHandler.KillTrackedSound(techniqueSoundInfo);
+                        HandleAuraStartupSound(currentTechnique.Value);
+                        techniqueSoundTimer = 0;
+                        techniqueAuraFrameTimer = 0;
+                    }
+                }
+                else
+                {
+                    SoundHandler.KillTrackedSound(techniqueSoundInfo);
+                    currentTechnique = null;
                 }
             }
             else
             {
                 SoundHandler.KillTrackedSound(auraSoundInfo);
-                currentAnimation = new AnimationData();
+                SoundHandler.KillTrackedSound(techniqueSoundInfo);
+                currentForm = null;
+                currentTechnique = null;
             }
-            previousAnimation = currentAnimation;
-            HandleAuraLoopSound(currentAnimation);
-            IncrementAuraFrameTimers(currentAnimation.Aura);
+
+            previousFrom = currentForm;
+            previousTechnique = currentTechnique;
+
+            HandleAuraLoopSound(currentForm, currentTechnique);
+            IncrementAuraFrameTimers(currentForm, currentTechnique);
         }
-        public void HandleAuraLoopSound(AnimationData data)
+        public void HandleAuraLoopSound(AnimationData? form, AnimationData? technique)
         {
-            if (data.Sound.Equals(new SoundData()))
+            if (!form.HasValue && !technique.HasValue)
                 return;
-            if (data.Sound.LoopSoundDuration <= 0 || string.IsNullOrEmpty(data.Sound.LoopAudioPath))
-                return;
-            if (SoundHandler.ShouldPlayPlayerAudio(Player, true))
+            if (form.HasValue)
             {
-                if (auraSoundtimer == 0)
-                    auraSoundInfo = SoundHandler.PlaySound(data.Sound.LoopAudioPath, Player, 0.7f);
-                auraSoundtimer++;
-                if (auraSoundtimer >= data.Sound.LoopSoundDuration)
-                    auraSoundtimer = 0;
+                if(!form.Value.Sound.Equals(new SoundData()))
+                {
+                    if (form.Value.Sound.LoopSoundDuration <= 0 || string.IsNullOrEmpty(form.Value.Sound.LoopAudioPath))
+                        return;
+                    if (SoundHandler.ShouldPlayPlayerAudio(Player, true))
+                    {
+                        if (auraSoundtimer == 0)
+                            auraSoundInfo = SoundHandler.PlaySound(form.Value.Sound.LoopAudioPath, Player, 0.7f);
+                        auraSoundtimer++;
+                        if (auraSoundtimer >= form.Value.Sound.LoopSoundDuration)
+                            auraSoundtimer = 0;
+                    }
+                    SoundHandler.UpdateTrackedSound(auraSoundInfo, Player.position);
+                }
             }
-            SoundHandler.UpdateTrackedSound(auraSoundInfo, Player.position);
+            if (technique.HasValue)
+            {
+                if (!technique.Value.Sound.Equals(new SoundData()))
+                {
+                    if (technique.Value.Sound.LoopSoundDuration <= 0 || string.IsNullOrEmpty(technique.Value.Sound.LoopAudioPath))
+                        return;
+                    if (SoundHandler.ShouldPlayPlayerAudio(Player, true))
+                    {
+                        if (techniqueSoundTimer == 0)
+                            techniqueSoundInfo = SoundHandler.PlaySound(technique.Value.Sound.LoopAudioPath, Player, 0.7f);
+                        techniqueSoundTimer++;
+                        if (techniqueSoundTimer >= technique.Value.Sound.LoopSoundDuration)
+                            techniqueSoundTimer = 0;
+                    }
+                    SoundHandler.UpdateTrackedSound(techniqueSoundInfo, Player.position);
+                }
+            }
+
+            
         }
         public void HandleAuraStartupSound(AnimationData data)
         {
@@ -309,22 +371,40 @@ namespace DBZGoatLib {
                 return;
             SoundHandler.PlaySound(data.Sound.StartAudioPath, Player, 0.7f, 0.1f);
         }
-        public void IncrementAuraFrameTimers(AuraData aura)
+        public void IncrementAuraFrameTimers(AnimationData? form, AnimationData? technique)
         {
-            if (aura.Equals(new AuraData()))
-                return;
-            dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { Player });
-            if (IsCharging())
-                ++auraFrameTimer;
-            ++auraFrameTimer;
-            if (auraFrameTimer >= 3)
+            if (form.HasValue)
             {
-                auraFrameTimer = 0;
-                ++auraCurrentFrame;
+                if(form.Value.Aura.Frames > 0)
+                {
+                    if (IsCharging())
+                        ++formAuraFrameTimer;
+                    ++formAuraFrameTimer;
+                    if (formAuraFrameTimer >= 3)
+                    {
+                        formAuraFrameTimer = 0;
+                        ++auraCurrentFrame;
+                    }
+                    if (auraCurrentFrame >= form.Value.Aura.Frames)
+                        auraCurrentFrame = 0;
+                }
             }
-            if (auraCurrentFrame < aura.Frames)
-                return;
-            auraCurrentFrame = 0;
+            if (technique.HasValue)
+            {
+                if (technique.Value.Aura.Frames > 0)
+                {
+                    if (IsCharging())
+                        ++techniqueAuraFrameTimer;
+                    ++techniqueAuraFrameTimer;
+                    if (techniqueAuraFrameTimer >= 3)
+                    {
+                        techniqueAuraFrameTimer = 0;
+                        ++techniqueCurrentFrame;
+                    }
+                    if (techniqueCurrentFrame >= technique.Value.Aura.Frames)
+                        techniqueCurrentFrame = 0;
+                }
+            }
         }
         public override void PreUpdate()
         {
@@ -378,6 +458,7 @@ namespace DBZGoatLib {
         #endregion
 
         #region Mastery Handling
+
         /// <summary>
         /// Gets the player's mastery. Only works with GoatLib transformations.
         /// </summary>

@@ -163,8 +163,8 @@ namespace DBZGoatLib.Handlers {
             if (!transformation.condition(player))
                 return;
 
-            if (IsTransformed(player) && !transformation.stackable)
-                ClearTransformations(player);
+            if (IsTransformed(player, true) && !transformation.stackable)
+                ClearNonstackables(player);
 
             StartTransformation(player, transformation);
         }
@@ -180,6 +180,7 @@ namespace DBZGoatLib.Handlers {
                 return;
             doTransform.Invoke(null, new object[] {player, buffInfo, DBZGoatLib.DBZMOD.Value.mod });
         }
+
         /// <summary>
         /// End all transformations, including DBT's
         /// </summary>
@@ -191,6 +192,20 @@ namespace DBZGoatLib.Handlers {
             SoundHandler.PlaySound("DBZMODPORT/Sounds/PowerDown", player, 0.3f);
 
             foreach (var transformation in Transformations) {
+                EndTranformation(player, transformation);
+            }
+        }
+
+        public static void ClearNonstackables(Player player)
+        {
+            var helper = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
+
+            helper.GetMethod("EndTransformations").Invoke(null, new object[] { player });
+
+            SoundHandler.PlaySound("DBZMODPORT/Sounds/PowerDown", player, 0.3f);
+
+            foreach (var transformation in Transformations.Where(x => !x.stackable)) 
+            {
                 EndTranformation(player, transformation);
             }
         }
