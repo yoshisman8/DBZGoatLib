@@ -180,6 +180,8 @@ namespace DBZGoatLib {
             var rolled = TraitHandler.RollTrait();
 
             SetTrait(rolled);
+
+            Traited = true;
         }
         public void RerollTraits()
         {
