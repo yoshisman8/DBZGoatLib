@@ -13,42 +13,41 @@ using Terraria.ModLoader.Config;
 
 namespace DBZGoatLib
 {
-    [Label("Client Settings")]
     public class DBZConfig : ModConfig
     {
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
         public static DBZConfig Instance;
 
-        [Header("Ki Bar Position")]
-        [Label("Position X")]
+        [Header("$Mods.DBZGoatLib.ConfigHeaders.KiBarPos")]
+        [LabelKey("$Mods.DBZGoatLib.ConfigLabels.KiBarX")]
         [DefaultValue(515f)]
-        [Tooltip("The X position of the Ki Bar.")]
+        [TooltipKey("$Mods.DBZGoatLib.ConfigToolTips.KiBarX")]
         public float KiBarX { get; set; }
 
-        [Label("Position Y")]
+        [LabelKey("$Mods.DBZGoatLib.ConfigLabels.KiBarY")]
         [DefaultValue(49f)]
-        [Tooltip("The Y position of the Ki Bar.")]
+        [TooltipKey("$Mods.DBZGoatLib.ConfigToolTips.KiBarY")]
         public float KiBarY { get; set; }
 
-        [Label("Show ki value underneath bar")]
+        [LabelKey("$Mods.DBZGoatLib.ConfigLabels.ShowKi")]
         [DefaultValue(false)]
-        [Tooltip("Constantly show the Ki values underneath the Ki Bar.")]
+        [TooltipKey("$Mods.DBZGoatLib.ConfigToolTips.ShowKi")]
         public bool ShowKi;
 
-        [Label("Use new Ki Bar")]
+        [LabelKey("$Mods.DBZGoatLib.ConfigLabels.UseNewKiBar")]
         [DefaultValue(true)]
-        [Tooltip("Use the new Ki Bar sprites. Cannot be disabled if Dragon Ball Terraria is not installed.")]
+        [TooltipKey("$Mods.DBZGoatLib.ConfigToolTips.UseNewKiBar")]
         public bool UseNewKiBar;
 
-        [Header("Transformation Menu Position")]
-        [Label("Position X")]
-        [Tooltip("The X position of the Transformation Menu.")]
+        [Header("$Mods.DBZGoatLib.ConfigHeaders.TransMenuPos")]
+        [LabelKey("$Mods.DBZGoatLib.ConfigLabels.TransMenuX")]
+        [TooltipKey("$Mods.DBZGoatLib.ConfigToolTips.TransMenuX")]
         [DefaultValue(661f)]
         public float TransMenuX { get; set; }
 
-        [Label("Position Y")]
-        [Tooltip("The Y position of the Transformation Menu.")]
+        [LabelKey("$Mods.DBZGoatLib.ConfigLabels.TransMenuY")]
+        [TooltipKey("$Mods.DBZGoatLib.ConfigToolTips.TransMenuX")]
         [DefaultValue(396f)]
         public float TransMenuY { get; set; }
         public override bool AcceptClientChanges(ModConfig pendingConfig, int whoAmI, ref string message)

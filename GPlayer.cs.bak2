@@ -102,7 +102,7 @@ namespace DBZGoatLib {
                 Traited = tag.GetBool("DBZGoatLib_Traited");
         }
         public override void OnEnterWorld() {
-            if (Player.whoAmI != Player.whoAmI)
+            if (player.whoAmI != Player.whoAmI)
                 return;
 
             foreach (var trans in TransformationHandler.Transformations) {
@@ -144,11 +144,11 @@ namespace DBZGoatLib {
             }
         }
         public override void PlayerDisconnect() 
-            => TransformationHandler.ClearTransformations(Player);
+            => TransformationHandler.ClearTransformations(player);
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource) 
             => TransformationHandler.ClearTransformations(Player);
         public override void OnRespawn() 
-            => TransformationHandler.ClearTransformations(Player);
+            => TransformationHandler.ClearTransformations(player);
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
             if (DBZGoatLib.OpenMenu.JustPressed)

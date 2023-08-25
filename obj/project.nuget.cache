@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "kcQ7Wuxxln3IQll/Xt9xA5ahMVPs4DON/2f/OxCVDxiQrnUPD54MvdKqzhihoanLId00FaKlFf0w5NPeEtxE+Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\shado\\Documents\\my games\\Terraria\\tModLoader\\ModSources\\DBZGoatLib\\DBZGoatLib.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\shado\\.nuget\\packages\\tmodloader.codeassist\\0.1.5\\tmodloader.codeassist.0.1.5.nupkg.sha512"
+  ],
+  "logs": []
+}
