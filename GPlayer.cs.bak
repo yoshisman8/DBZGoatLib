@@ -101,8 +101,8 @@ namespace DBZGoatLib {
             if (tag.ContainsKey("DBZGoatLib_Traited"))
                 Traited = tag.GetBool("DBZGoatLib_Traited");
         }
-        public override void OnEnterWorld() {
-            if (Player.whoAmI != Player.whoAmI)
+        public override void OnEnterWorld(Player player) {
+            if (player.whoAmI != Player.whoAmI)
                 return;
 
             foreach (var trans in TransformationHandler.Transformations) {
@@ -143,12 +143,12 @@ namespace DBZGoatLib {
                 return isCharging;
             }
         }
-        public override void PlayerDisconnect() 
-            => TransformationHandler.ClearTransformations(Player);
+        public override void PlayerDisconnect(Player player) 
+            => TransformationHandler.ClearTransformations(player);
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource) 
             => TransformationHandler.ClearTransformations(Player);
-        public override void OnRespawn() 
-            => TransformationHandler.ClearTransformations(Player);
+        public override void OnRespawn(Player player) 
+            => TransformationHandler.ClearTransformations(player);
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
             if (DBZGoatLib.OpenMenu.JustPressed)
@@ -537,7 +537,7 @@ namespace DBZGoatLib {
             foreach (var form in transformation)
                 HandleMasteryGain(form);
         }
-        public override void OnHitByNPC(NPC npc, Player.HurtInfo hurtInfo) {
+        public override void OnHitByNPC(NPC npc, int damage, bool crit) {
             if (!TransformationHandler.IsTransformed(Player))
                 return;
 
@@ -553,7 +553,7 @@ namespace DBZGoatLib {
             foreach (var form in transformation)
                 HandleMasteryGain(form);
         }
-        public override void OnHitByProjectile(Projectile proj, Player.HurtInfo hurtInfo) {
+        public override void OnHitByProjectile(Projectile proj, int damage, bool crit) {
             if (!TransformationHandler.IsTransformed(Player))
                 return;
 

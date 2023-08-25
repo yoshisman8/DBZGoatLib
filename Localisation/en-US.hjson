@@ -1,0 +1,36 @@
+Mods: {
+	DBZGoatLib: {
+		ConfigHeaders: {
+			KiBarPos: Ki Bar Position
+			TransMenuPos: Transformation Menu Position
+		}
+
+		ConfigLabels: {
+			KiBarX: Position X
+			KiBarY: Position Y
+			ShowKi: Show ki value underneath bar
+			UseNewKiBar: Use new Ki Bar
+			TransMenuX: Position X
+			TransMenuY: Position Y
+		}
+
+		ConfigTooltips: {
+			KiBarX: The X position of the Ki Bar.
+			KiBarY: The Y position of the Ki Bar.
+			ShowKi: Constantly show the Ki values underneath the Ki Bar.
+			UseNewKiBar: Use the new Ki Bar sprites. Cannot be disabled if Dragon Ball Terraria is not installed.
+			TransMenuX: The X position of the Transformation Menu.
+			TransMenuY: The Y position of the Transformation Menu.
+		}
+
+		Configs.DBZConfig.DisplayName: D B Z Config
+
+		ConfigToolTips: {
+			ShowKi: ""
+			UseNewKiBar: ""
+			KiBarX: ""
+			KiBarY: ""
+			TransMenuX: ""
+		}
+	}
+}

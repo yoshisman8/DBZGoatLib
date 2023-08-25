@@ -65,7 +65,7 @@ namespace DBZGoatLib.UI
             PrevTreeButton.Height.Set(36, 0f);
             PrevTreeButton.Left.Set(22, 0f);
             PrevTreeButton.Top.Set(8, 0f);
-            PrevTreeButton.OnLeftClick += PrevTree;
+            PrevTreeButton.OnClick += PrevTree;
             PrevTreeButton.OnMouseOver += (o, e) => { Tooltip = "Previous Transformation Tree"; };
             PrevTreeButton.OnMouseOut += (o, e) => { Tooltip = null; };
             Panel.Append(PrevTreeButton);
@@ -75,7 +75,7 @@ namespace DBZGoatLib.UI
             NextTreeButton.Height.Set(36, 0f);
             NextTreeButton.Left.Set(306, 0f);
             NextTreeButton.Top.Set(8, 0f);
-            NextTreeButton.OnLeftClick += NextTree;
+            NextTreeButton.OnClick += NextTree;
             NextTreeButton.OnMouseOver += (o, e) => { Tooltip = "Next Transformation Tree"; };
             NextTreeButton.OnMouseOut += (o, e) => { Tooltip = null; };
             Panel.Append(NextTreeButton);
@@ -85,7 +85,7 @@ namespace DBZGoatLib.UI
             InfoButton.Height.Set(36, 0f);
             InfoButton.Left.Set(306, 0);
             InfoButton.Top.Set(252, 0);
-            InfoButton.OnLeftClick += (o, e) => { Transitioning = true; InfoVisible ^= true; };
+            InfoButton.OnClick += (o, e) => { Transitioning = true; InfoVisible ^= true; };
             InfoButton.OnMouseOver += (s, e) => { Tooltip = "Ki Class statistics."; };
             InfoButton.OnMouseOut += (o, e) => { Tooltip = null; };
             Panel.Append(InfoButton);

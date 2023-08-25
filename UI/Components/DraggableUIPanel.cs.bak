@@ -26,15 +26,15 @@ namespace DBZGoatLib.UI.Components
             base.OnInitialize();
 		}
 		
-        public override void LeftMouseDown(UIMouseEvent evt)
+        public override void MouseDown(UIMouseEvent evt)
 		{
-			base.LeftMouseDown(evt);
+			base.MouseDown(evt);
 			DragStart(evt);
 		}
 
-		public override void LeftMouseUp(UIMouseEvent evt)
+		public override void MouseUp(UIMouseEvent evt)
 		{
-			base.LeftMouseUp(evt);
+			base.MouseUp(evt);
 			DragEnd(evt);
 		}
 
