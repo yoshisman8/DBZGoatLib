@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-
+using System.Runtime.InteropServices;
 using DBZGoatLib.Handlers;
 using DBZGoatLib.Model;
 using DBZGoatLib.UI;
@@ -101,8 +101,8 @@ namespace DBZGoatLib {
             if (tag.ContainsKey("DBZGoatLib_Traited"))
                 Traited = tag.GetBool("DBZGoatLib_Traited");
         }
-        public override void OnEnterWorld(Player player) {
-            if (player.whoAmI != Player.whoAmI)
+        public override void OnEnterWorld() {
+            if (Player.whoAmI != Player.whoAmI)
                 return;
 
             foreach (var trans in TransformationHandler.Transformations) {
@@ -143,20 +143,21 @@ namespace DBZGoatLib {
                 return isCharging;
             }
         }
-        public override void PlayerDisconnect(Player player) 
-            => TransformationHandler.ClearTransformations(player);
+        public override void PlayerDisconnect() 
+            => TransformationHandler.ClearTransformations(Player);
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource) 
             => TransformationHandler.ClearTransformations(Player);
-        public override void OnRespawn(Player player) 
-            => TransformationHandler.ClearTransformations(player);
+        public override void OnRespawn() 
+            => TransformationHandler.ClearTransformations(Player);
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
             if (DBZGoatLib.OpenMenu.JustPressed)
                 TransformationMenu.Visible ^= true;
             DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransMenu")).GetField("menuvisible").SetValue(null, false);
             ProcessTransformationTriggers();
-
-            if (TransformationHandler.EnergyChargeKey.JustPressed && (bool)DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("ConfigModel")).GetField("isChargeToggled").GetValue(null))
+            dynamic myPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer", DBZGoatLib.flagsAll).Invoke(null, new object[] { Player });
+            dynamic dbtConfig = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetField("activeConfig",DBZGoatLib.flagsAll).GetValue(myPlayer);
+            if (TransformationHandler.EnergyChargeKey.JustPressed && (bool)dbtConfig.IsChargeToggled)
             {
                 isCharging ^= true;
             }
@@ -537,7 +538,7 @@ namespace DBZGoatLib {
             foreach (var form in transformation)
                 HandleMasteryGain(form);
         }
-        public override void OnHitByNPC(NPC npc, int damage, bool crit) {
+        public override void OnHitByNPC(NPC npc, Player.HurtInfo hurtInfo) {
             if (!TransformationHandler.IsTransformed(Player))
                 return;
 
@@ -553,7 +554,7 @@ namespace DBZGoatLib {
             foreach (var form in transformation)
                 HandleMasteryGain(form);
         }
-        public override void OnHitByProjectile(Projectile proj, int damage, bool crit) {
+        public override void OnHitByProjectile(Projectile proj, Player.HurtInfo hurtInfo) {
             if (!TransformationHandler.IsTransformed(Player))
                 return;
 

@@ -5,6 +5,8 @@ using System.Text;
 using DBZGoatLib.Handlers;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace DBZGoatLib.Model {
@@ -84,7 +86,7 @@ namespace DBZGoatLib.Model {
 
         public override void Load()
         {
-            if(Type != 0)
+            if (Type != 0)
                 TransformationHandler.RegisterTransformation(Info);
         }
         public override void Unload()
@@ -96,11 +98,12 @@ namespace DBZGoatLib.Model {
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;
             Main.debuff[Type] = false;
-
-            DisplayName.SetDefault(FormName());
-            Description.SetDefault(BuildTooltip());
         }
 
+        public override void ModifyBuffText(ref string buffName, ref string tip, ref int rare)
+        {
+            tip = BuildTooltip();
+        }
         public string BuildTooltip() {
             var dmg = damageMulti - 1f;
             var speed = speedMulti - 1f;

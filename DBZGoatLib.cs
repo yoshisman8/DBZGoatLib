@@ -7,7 +7,9 @@ using DBZGoatLib.Handlers;
 using DBZGoatLib.Model;
 using DBZGoatLib.Network;
 using DBZGoatLib.UI;
+using MonoMod.Core;
 using MonoMod.RuntimeDetour;
+using MonoMod.Utils;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
@@ -21,7 +23,7 @@ namespace DBZGoatLib
         | BindingFlags.Instance | BindingFlags.Static | BindingFlags.GetField
         | BindingFlags.SetField | BindingFlags.GetProperty | BindingFlags.SetProperty;
 
-        internal List<Detour> Detours = new List<Detour>();
+        internal List<ICoreNativeDetour> Detours = new List<ICoreNativeDetour>();
         internal List<Hook> Hooks = new List<Hook>();
 
         public static readonly Lazy<Mod> Instance = new(() => ModLoader.GetMod("DBZGoatLib"));
@@ -33,8 +35,6 @@ namespace DBZGoatLib
         {
             if (DBZMOD.Value.loaded)
             {
-                MonoModHooks.RequestNativeAccess();
-
                 var MyPlayer = DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
 
                 TransformationHandler.TransformKey = (ModKeybind)MyPlayer.GetField("transform").GetValue(null);
@@ -127,9 +127,7 @@ namespace DBZGoatLib
                 method = type.GetProperty(name, flagsAll).GetMethod;
             }
 
-            var detour = new Detour(method, to.GetMethod(toName, flagsAll));
-
-            detour.Apply();
+            var detour = DetourFactory.CreateNativeDetour(DetourFactory.Current, method.GetLdftnPointer(), to.GetMethod(toName, flagsAll).GetLdftnPointer());
 
             Detours.Add(detour);
         }
@@ -137,10 +135,10 @@ namespace DBZGoatLib
         {
             Logger.Info($"type {type.FullName}   name {name}   args {{{string.Join(",", args.Select(a => a.FullName))}}}   to {to.FullName}   toName {toName}");
 
-            Detours.Add(new Detour(type.GetMethod(name, args), to.GetMethod(toName, flagsAll)));
+            Detours.Add(DetourFactory.CreateNativeDetour(DetourFactory.Current, type.GetMethod(name, args).GetLdftnPointer(), to.GetMethod(toName, flagsAll).GetLdftnPointer()));
         }
         public void AddDetour(Type type, string name) =>
-            Detours.Add(new Detour(type.GetMethod(name, flagsAll), GetType().GetMethod("Nothing", flagsAll)));
+            Detours.Add(DetourFactory.CreateNativeDetour(DetourFactory.Current, type.GetMethod(name, flagsAll).GetLdftnPointer(), GetType().GetMethod("Nothing", flagsAll).GetLdftnPointer()));
         public void Nothing() { }
         #endregion
     }

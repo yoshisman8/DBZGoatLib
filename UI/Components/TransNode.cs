@@ -53,7 +53,7 @@ namespace DBZGoatLib.UI.Components
             Lock.Height.Set(32, 0f);
             Lock.IgnoresMouseInteraction = true;
         }
-        public override void Click(UIMouseEvent evt)
+        public override void LeftClick(UIMouseEvent evt)
         {
             if (!Node.UnlockCondition(Main.CurrentPlayer) || !Node.DiscoverCondition(Main.CurrentPlayer))
             {
