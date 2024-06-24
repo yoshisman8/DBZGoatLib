@@ -280,6 +280,15 @@ namespace DBZGoatLib.Handlers
             return (bool)isKaioken.Invoke(null, [player]);
         }
 
+        internal static bool IsSuperKaioken(Player player)
+        {
+            TypeInfo tHandler =
+                DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
+            MethodInfo isSuperKaioken = tHandler.GetMethod("IsSuperKaioken", [typeof(Player)]);
+
+            return (bool)isSuperKaioken.Invoke(null, [player]);
+        }
+
         private static void StartTransformation(Player player, TransformationInfo transformation)
         {
             player.AddBuff(transformation.buffID, 666666, false);

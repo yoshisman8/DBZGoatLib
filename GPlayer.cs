@@ -727,6 +727,15 @@ namespace DBZGoatLib
                         }
                     }
                 }
+                
+                if (TransformationHandler.IsSuperKaioken(Player) && TransformationHandler.EnergyChargeKey.Current)
+                {
+                    TransformationInfo? current = TransformationHandler.GetCurrentTransformation(Player);
+                    if (!current.HasValue) return null;
+                    
+                    //Only direction back is SSJ1, no need to validate
+                    return TransformationHandler.GetTransformation("SSJ1Buff");
+                }
             }
             
             return null;
