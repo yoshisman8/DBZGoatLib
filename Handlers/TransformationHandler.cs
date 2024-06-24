@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Reflection;
+using System.Text;
 using DBZGoatLib.Model;
 using DBZGoatLib.Network;
 using DBZGoatLib.UI;
@@ -9,11 +10,12 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace DBZGoatLib.Handlers {
-
-    public sealed class TransformationHandler {
-
-        internal static readonly List<string> DBTForms = new() {
+namespace DBZGoatLib.Handlers
+{
+    public sealed class TransformationHandler
+    {
+        internal static readonly List<string> DBTForms =
+        [
             "SSJ1Buff",
             "ASSJBuff",
             "USSJBuff",
@@ -26,28 +28,50 @@ namespace DBZGoatLib.Handlers {
             "LSSJBuff",
             "LSSJ2Buff",
             "LSSJ3Buff"
-        };
+        ];
 
-        private static readonly List<string> DBCAForms = new() {
-            "UIBuff",
-            "UISignBuff",
-            "UEBuff"
-        };
-
-        private static TransformationInfo[] DBT_Transformation_Info { get
+        private static TransformationInfo[] DBT_Transformation_Info
+        {
+            get
             {
-                List<TransformationInfo> list = new();
-                foreach (var buffName in DBTForms)
-                    list.Add(new TransformationInfo(DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(buffName).Type, buffName, false, Defaults.FormNames[buffName], Defaults.FormColors[buffName], (p) => { return DBTFormCheck(buffName, p); }, null, null, new AnimationData(),Defaults.GetFormKiBar(buffName)));
-                return list.ToArray();
+                if (dbtTransformInfo == null)
+                {
+                    dbtTransformInfo = new TransformationInfo[DBTForms.Count];
+
+                    for (int i = 0; i < DBTForms.Count; i++)
+                    {
+                        string buffName = DBTForms[i];
+                        ModBuff buff = DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(buffName);
+
+                        TransformationInfo ti = new TransformationInfo(
+                            buff.Type,
+                            buffName,
+                            false,
+                            Defaults.FormNames[buffName],
+                            Defaults.FormColors[buffName],
+                            p => DBTFormCheck(buffName, p),
+                            null,
+                            null,
+                            new AnimationData(),
+                            Defaults.GetFormKiBar(buffName));
+
+                        dbtTransformInfo[i] = ti;
+                    }
+                }
+
+                return dbtTransformInfo;
             }
         }
 
+        private static TransformationInfo[] dbtTransformInfo;
+
         private static bool DBTFormCheck(string BuffName, Player player)
         {
-            dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { player });
+            dynamic modPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"))
+                .GetMethod("ModPlayer").Invoke(null,
+                    [player]);
 
-            if(BuffName == "SSJ2Buff")
+            if (BuffName == "SSJ2Buff")
                 return !(bool)modPlayer.IsPlayerLegendary();
             if (BuffName == "LSSJBuff")
                 return (bool)modPlayer.lssjAchieved && (bool)modPlayer.IsPlayerLegendary();
@@ -72,34 +96,36 @@ namespace DBZGoatLib.Handlers {
         /// <summary>
         /// List of all Transformations. Can be added to.
         /// </summary>
-        public static List<TransformationInfo> Transformations { get; private set; } = new List<TransformationInfo>();
+        public static List<TransformationInfo> Transformations { get; private set; } = [];
 
         /// <summary>
         /// List of all registered form chains. Can be added to.
         /// </summary>
-        public static List<TransformationChain> TransformationChains { get; private set; } = new List<TransformationChain>();
+        public static List<TransformationChain> TransformationChains { get; private set; } = [];
 
         /// <summary>
         /// Register a new transformation into the handler.
         /// </summary>
-        public static void RegisterTransformation(TransformationInfo transformation) => Transformations.Add(transformation);
+        public static void RegisterTransformation(TransformationInfo transformation) =>
+            Transformations.Add(transformation);
 
         /// <summary>
         /// Unregisters as transformation from the handler.
         /// </summary>
         /// <param name="transformation"></param>
-        public static void UnregisterTransformation(TransformationInfo transformation) 
+        public static void UnregisterTransformation(TransformationInfo transformation)
         {
             int index = Transformations.FindIndex(x => x.buffKeyName == transformation.buffKeyName);
-            if (index > -1) 
+            if (index > -1)
                 Transformations.RemoveAt(index);
         }
-        
+
         /// <summary>
         /// Registers a new batch of transformation chains. Not required for basic functionality.
         /// </summary>
         /// <param name="chain"></param>
-        public static void RegisterTransformationChains(List<TransformationChain> chain) => TransformationChains.AddRange(chain);
+        public static void RegisterTransformationChains(List<TransformationChain> chain) =>
+            TransformationChains.AddRange(chain);
 
         /// <summary>
         /// Unregisters a transformation chain. Be careful when removing vanilla transformation chains!
@@ -107,8 +133,9 @@ namespace DBZGoatLib.Handlers {
         /// <param name="chain"></param>
         public static void UnregisterTransformationChain(TransformationChain chain)
         {
-            int index = TransformationChains.FindIndex(x => x.TransformationBuffKeyName == chain.TransformationBuffKeyName);
-            if(index > -1)
+            int index = TransformationChains.FindIndex(x =>
+                x.TransformationBuffKeyName == chain.TransformationBuffKeyName);
+            if (index > -1)
                 TransformationChains.RemoveAt(index);
         }
 
@@ -121,10 +148,9 @@ namespace DBZGoatLib.Handlers {
         /// <returns></returns>
         public static TransformationInfo? GetTransformation(int buffid)
         {
-            if (!Transformations.Any(x => x.buffID == buffid))
+            if (Transformations.All(x => x.buffID != buffid))
                 return null;
-            else 
-                return Transformations.First(x => x.buffID == buffid);
+            return Transformations.First(x => x.buffID == buffid);
         }
 
         /// <summary>
@@ -140,9 +166,10 @@ namespace DBZGoatLib.Handlers {
             {
                 return DBT_Transformation_Info.First(x => x.buffKeyName == buffName);
             }
-            else if (Transformations.Any(x => x.buffKeyName == buffName))
+
+            if (Transformations.Any(x => x.buffKeyName == buffName))
                 return Transformations.First(x => x.buffKeyName == buffName);
-            else return null;
+            return null;
         }
 
         /// <summary>
@@ -150,8 +177,8 @@ namespace DBZGoatLib.Handlers {
         /// </summary>
         /// <param name="player">Player to be transformed.</param>
         /// <param name="transformation">Transformation Info</param>
-        public static void Transform(Player player, TransformationInfo transformation) {
-
+        public static void Transform(Player player, TransformationInfo transformation)
+        {
             if (DBTForms.Contains(transformation.buffKeyName))
             {
                 ExternalTransform(player, transformation);
@@ -159,52 +186,67 @@ namespace DBZGoatLib.Handlers {
             }
 
             if (player.HasBuff(transformation.buffID))
+            {
                 return;
+            }
+
             if (!transformation.condition(player))
+            {
                 return;
+            }
 
             if (IsTransformed(player, true) && !transformation.stackable)
+            {
                 ClearNonstackables(player);
+            }
 
             StartTransformation(player, transformation);
         }
 
         private static void ExternalTransform(Player player, TransformationInfo form)
         {
-            var tHandler = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
+            TypeInfo tHandler =
+                DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
             dynamic buffInfo = tHandler.GetProperty(Defaults.FormPaths[form.buffKeyName]).GetValue(null);
-            var canTransform = tHandler.GetMethod("CanTransform", new Type[] { typeof(Player), DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("BuffInfo")).AsType() });
-            var doTransform = tHandler.GetMethod("DoTransform");
+            MethodInfo canTransform = tHandler.GetMethod("CanTransform", [ 
+                typeof(Player),
+                DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("BuffInfo")).AsType()
+            ]);
+            MethodInfo doTransform = tHandler.GetMethod("DoTransform");
 
-            if (!(bool)canTransform.Invoke(null, new object[] { player, buffInfo }))
+            if (!(bool)canTransform.Invoke(null, [player, buffInfo]))
                 return;
-            doTransform.Invoke(null, new object[] {player, buffInfo, DBZGoatLib.DBZMOD.Value.mod });
+            doTransform.Invoke(null, [player, buffInfo, DBZGoatLib.DBZMOD.Value.mod]);
         }
 
         /// <summary>
         /// End all transformations, including DBT's
         /// </summary>
-        public static void ClearTransformations(Player player) {
-            var helper = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
+        public static void ClearTransformations(Player player)
+        {
+            TypeInfo helper =
+                DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
 
-            helper.GetMethod("EndTransformations").Invoke(null, new object[] { player });
+            helper.GetMethod("EndTransformations").Invoke(null, [player]);
 
             SoundHandler.PlaySound("DBZMODPORT/Sounds/PowerDown", player, 0.3f);
 
-            foreach (var transformation in Transformations) {
+            foreach (TransformationInfo transformation in Transformations)
+            {
                 EndTranformation(player, transformation);
             }
         }
 
         public static void ClearNonstackables(Player player)
         {
-            var helper = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
+            TypeInfo helper =
+                DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
 
-            helper.GetMethod("EndTransformations").Invoke(null, new object[] { player });
+            helper.GetMethod("EndTransformations").Invoke(null, [player]);
 
             SoundHandler.PlaySound("DBZMODPORT/Sounds/PowerDown", player, 0.3f);
 
-            foreach (var transformation in Transformations.Where(x => !x.stackable)) 
+            foreach (TransformationInfo transformation in Transformations.Where(x => !x.stackable))
             {
                 EndTranformation(player, transformation);
             }
@@ -215,10 +257,12 @@ namespace DBZGoatLib.Handlers {
         /// </summary>
         /// <param name="player"></param>
         /// <param name="buffId"></param>
-        public static void EndTranformation(Player player, TransformationInfo transformation) {
-            if (player.HasBuff(transformation.buffID)) {
-                player.DelBuff(player.FindBuffIndex(transformation.buffID));
-
+        public static void EndTranformation(Player player, TransformationInfo transformation)
+        {
+            if (player.HasBuff(transformation.buffID))
+            {
+                player.ClearBuff(transformation.buffID);
+                
                 transformation.postTransform(player);
 
                 if (Main.dedServ || Main.netMode != NetmodeID.MultiplayerClient || player.whoAmI != Main.myPlayer)
@@ -227,98 +271,115 @@ namespace DBZGoatLib.Handlers {
             }
         }
 
-        internal static bool IsKaioken(Player player) 
+        internal static bool IsKaioken(Player player)
         {
-            var tHandler = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
-            var isKaioken = tHandler.GetMethod("IsKaioken", new Type[] { typeof(Player) });
+            TypeInfo tHandler =
+                DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("TransformationHelper"));
+            MethodInfo isKaioken = tHandler.GetMethod("IsKaioken", [typeof(Player)]);
 
-            return (bool)isKaioken.Invoke(null, new object[] { player });
+            return (bool)isKaioken.Invoke(null, [player]);
         }
-        private static void StartTransformation(Player player, TransformationInfo transformation) {
+
+        private static void StartTransformation(Player player, TransformationInfo transformation)
+        {
             player.AddBuff(transformation.buffID, 666666, false);
             if (!string.IsNullOrEmpty(transformation.transformationText))
-                CombatText.NewText(player.Hitbox, transformation.tranformtionColor, transformation.transformationText, false, false);
+                CombatText.NewText(player.Hitbox, transformation.tranformtionColor, transformation.transformationText,
+                    false, false);
             if (!Main.dedServ && Main.netMode == NetmodeID.MultiplayerClient && player.whoAmI == Main.myPlayer)
-                NetworkHelper.transSync.SendFormChanges(256, player.whoAmI, player.whoAmI, transformation.buffID, 666666);
+                NetworkHelper.transSync.SendFormChanges(256, player.whoAmI, player.whoAmI, transformation.buffID,
+                    666666);
             transformation.onTransform(player);
         }
 
         /// <summary>
         /// Checks whether the user is transformed or not.
         /// </summary>
-        public static bool IsTransformed(Player player, bool IgnoreStackable = false) {
-            foreach (var trans in Transformations) {
+        public static bool IsTransformed(Player player, bool IgnoreStackable = false)
+        {
+            foreach (TransformationInfo trans in Transformations)
+            {
                 if (player.HasBuff(trans.buffID))
+                {
                     if (IgnoreStackable && trans.stackable)
+                    {
                         continue;
-                    else return true;
+                    }
+
+                    return true;
+                }
             }
-            foreach (var ext in DBT_Transformation_Info)
+            
+            foreach (TransformationInfo ext in DBT_Transformation_Info)
             {
                 if (player.HasBuff(ext.buffID))
+                {
                     return true;
+                }
             }
-            //if (!IgnoreDBTtransformations) {
-            //    if (ModLoader.HasMod("DBZMODPORT")) {
-            //        foreach (var ext in DBTForms) {
-            //            if (player.HasBuff(DBZGoatLib.DBZMOD.Value.mod.Find<ModBuff>(ext).Type))
-            //                return true;
-            //        }
-            //    }
-
-            //    //if (ModLoader.HasMod("dbzcalamity")) {
-            //    //    foreach (var ext in DBCAForms) {
-            //    //        if (player.HasBuff(DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type))
-            //    //            return true;
-            //    //    }
-            //    //}
-            //}
+            
             return false;
         }
 
+        private static bool doOnce = true;
         /// <summary>
         /// Gets the current transformation the player has. Returns null if none is found.
         /// DOES NOT CHECK FOR STACKABLE FORMS.
         /// </summary>
-        public static TransformationInfo? GetCurrentTransformation(Player player) {
-            foreach (var transformation in Transformations.Where(x => !x.stackable)) {
-                if (player.HasBuff(transformation.buffID))
-                    return transformation;
-            }
-            foreach (var transformation in DBT_Transformation_Info.Where(x => !x.stackable))
+        public static TransformationInfo? GetCurrentTransformation(Player player)
+        {
+            foreach (TransformationInfo transformation in Transformations.Where(x => !x.stackable))
             {
                 if (player.HasBuff(transformation.buffID))
+                {
                     return transformation;
+                }
             }
+
+            foreach (TransformationInfo transformation in DBT_Transformation_Info.Where(x => !x.stackable))
+            {   
+                if (player.HasBuff(transformation.buffID))
+                {
+                    return transformation;
+                }
+            }
+
             return null;
         }
 
         /// <summary>
         /// Gets the current STACKABLE transformation the player has. Returns null if none is found
         /// </summary>
-        public static TransformationInfo? GetCurrentStackedTransformation(Player player) {
-            foreach (var transformation in Transformations.Where(x => x.stackable)) {
+        public static TransformationInfo? GetCurrentStackedTransformation(Player player)
+        {
+            foreach (TransformationInfo transformation in Transformations.Where(x => x.stackable))
+            {
                 if (player.HasBuff(transformation.buffID))
                     return transformation;
             }
+
             return null;
         }
 
         /// <summary>
         /// Gets ALL current transformations the player has, including stacked ones. Returns an empty array if the user is not transformed.
         /// </summary>
-        public static TransformationInfo[] GetAllCurrentForms(Player player) {
-            List<TransformationInfo> list = new();
+        public static TransformationInfo[] GetAllCurrentForms(Player player)
+        {
+            List<TransformationInfo> list = [];
 
-            foreach (var transformation in Transformations) {
+            foreach (TransformationInfo transformation in Transformations)
+            {
                 if (player.HasBuff(transformation.buffID))
                     list.Add(transformation);
             }
-            foreach (var external in DBT_Transformation_Info)
+
+            foreach (TransformationInfo external in DBT_Transformation_Info)
             {
                 if (player.HasBuff(external.buffID))
                     list.Add(external);
             }
+
             return list.ToArray();
         }
 
@@ -327,29 +388,25 @@ namespace DBZGoatLib.Handlers {
         /// Returns true if an overlap was found. 
         /// Does not check for Stackable forms.
         /// </summary>
-        public static bool IsAnythingBut(Player player, int buffId, bool includeExternal = false) {
-            foreach (var trans in Transformations) {
+        public static bool IsAnythingBut(Player player, int buffId, bool includeExternal = false)
+        {
+            foreach (TransformationInfo trans in Transformations)
+            {
                 if (trans.stackable)
                     continue;
                 if (player.HasBuff(trans.buffID) && trans.buffID != buffId)
                     return true;
             }
 
-            if (ModLoader.HasMod("DBZMODPORT") && includeExternal) {
-                foreach (var ext in DBT_Transformation_Info) {
+            if (ModLoader.HasMod("DBZMODPORT") && includeExternal)
+            {
+                foreach (TransformationInfo ext in DBT_Transformation_Info)
+                {
                     if (player.HasBuff(ext.buffID) && ext.buffID != buffId && !ext.stackable)
                         return true;
                 }
             }
-
-            //if (ModLoader.HasMod("dbzcalamity") && includeExternal) {
-            //    foreach (var ext in DBCAForms) {
-            //        int extType = DBZGoatLib.DBCAMOD.Value.mod.Find<ModBuff>(ext).Type;
-            //        if (player.HasBuff(extType) && extType != buffId)
-            //            return true;
-            //    }
-            //}
-
+            
             return false;
         }
 
@@ -361,9 +418,9 @@ namespace DBZGoatLib.Handlers {
         /// <returns>Array of matching transformation chains. Array is empty if non are found.</returns>
         public static TransformationChain[] GetChain(TransformationInfo transformation, bool Charge = false)
         {
-            List<TransformationChain> chains = new();
-            foreach (var c in TransformationChains)
-                if(c.TransformationBuffKeyName == transformation.buffKeyName && c.Charging == Charge)
+            List<TransformationChain> chains = [];
+            foreach (TransformationChain c in TransformationChains)
+                if (c.TransformationBuffKeyName == transformation.buffKeyName && c.Charging == Charge)
                     chains.Add(c);
             return chains.ToArray();
         }
