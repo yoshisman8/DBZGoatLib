@@ -51,9 +51,9 @@ namespace DBZGoatLib.Model
             new TransformationChain("LSSJBuff", false, "LSSJ2Buff", "SSJ1Buff"),
             new TransformationChain("LSSJ2Buff", false, "LSSJ3Buff", "LSSJBuff"),
             new TransformationChain("LSSJ3Buff", false, null, "LSSJ2Buff"),
-            new TransformationChain("SSJGBuff", false, null, "SSJ3Buff"),
-            new TransformationChain("SSJRBuff", false, null, "SSJGBuff"),
-            new TransformationChain("SSJBBuff", false, null, "SSJGBuff")
+            new TransformationChain("SSJGBuff", false, "SSJRBuff", "SSJ3Buff"),
+            new TransformationChain("SSJRBuff", false, "SSJBBuff", "SSJGBuff"),
+            new TransformationChain("SSJBBuff", false, "SSJRBuff", "SSJGBuff")
         ];
 
         public static bool SSJ1Condition(Player player)
