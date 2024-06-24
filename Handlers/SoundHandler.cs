@@ -57,12 +57,12 @@ namespace DBZGoatLib.Handlers {
                 return new KeyValuePair<uint, ActiveSound>(InvalidSlot, null);
             SoundStyle customStyle = GetCustomStyle(soundId, volume, pitchVariance);
             SlotId slotId = !location.Equals(Vector2.Zero) ? SoundEngine.PlaySound(customStyle, new Vector2?(location)) : SoundEngine.PlaySound(customStyle, new Vector2?());
-            SoundEngine.TryGetActiveSound(slotId, out var activeSound);
+            SoundEngine.TryGetActiveSound(slotId, out ActiveSound activeSound);
             return new KeyValuePair<uint, ActiveSound>(slotId.Value, activeSound);
         }
 
         public static void PlaySound(SlotId slotId) {
-            SoundEngine.TryGetActiveSound(slotId, out var activeSound);
+            SoundEngine.TryGetActiveSound(slotId, out ActiveSound activeSound);
             if (activeSound.IsPlaying)
                 return;
             activeSound.Resume();

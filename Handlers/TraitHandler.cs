@@ -36,7 +36,7 @@ namespace DBZGoatLib.Handlers
 
         public static TraitInfo? GetTraitByName(string name)
         {
-            var fetch = Traits.Find(x => x.Name == name);
+            TraitInfo fetch = Traits.Find(x => x.Name == name);
             if (fetch.Equals(new TraitInfo()))
                 return null;
             return fetch;
@@ -50,9 +50,9 @@ namespace DBZGoatLib.Handlers
         /// <returns></returns>
         public static TraitInfo RollTrait(bool IncludeTraitless = true, string previous = null)
         {
-            var Weighted = new WeightedRandom<TraitInfo>();
+            WeightedRandom<TraitInfo> Weighted = new WeightedRandom<TraitInfo>();
 
-            foreach (var trait in Traits.Where(x => x.Name != previous))
+            foreach (TraitInfo trait in Traits.Where(x => x.Name != previous))
                 Weighted.Add(trait, trait.Weight);
 
             if (IncludeTraitless)

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria.GameContent.UI.Elements;
+using Terraria.UI;
 
 namespace DBZGoatLib.UI.Components
 {
@@ -34,7 +35,7 @@ namespace DBZGoatLib.UI.Components
         }
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            var dimensions = GetDimensions();
+            CalculatedStyle dimensions = GetDimensions();
             Rectangle rectangle = new Rectangle(0, (int)(Height.Pixels / frames) * (int)(frameCounter / 5), (int)Width.Pixels, (int)(Height.Pixels / frames));
             Vector2 position = new Vector2(dimensions.X, dimensions.Y);
 

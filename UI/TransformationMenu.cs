@@ -90,7 +90,7 @@ namespace DBZGoatLib.UI
             InfoButton.OnMouseOut += (o, e) => { Tooltip = null; };
             Panel.Append(InfoButton);
 
-            var Title = new UIText(transformationPanel.Name);
+            UIText Title = new UIText(transformationPanel.Name);
             Title.Height.Set(24, 0f);
             Title.Width.Set(200, 0f);
             Title.Left.Set(82, 0f);
@@ -121,33 +121,33 @@ namespace DBZGoatLib.UI
 
             if (transformationPanel.Name == Defaults.DefaultPanel.Name)
             {
-                foreach (var subpanel in UIHandler.Panels.Where(x => !x.Complete))
+                foreach (TransformationPanel subpanel in UIHandler.Panels.Where(x => !x.Complete))
                 {
-                    foreach (var connection in subpanel.Connections)
+                    foreach (Connection connection in subpanel.Connections)
                     {
-                        var line = new TransConnector(connection);
+                        TransConnector line = new TransConnector(connection);
                         Connections.Add(line);
                         Grid.Append(line);
                     }
-                    foreach (var node in subpanel.Nodes)
+                    foreach (Node node in subpanel.Nodes)
                     {
-                        var Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
+                        TransNode Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
                         Nodes.Add(Button);
                         Grid.Append(Button);
                     }
                 }
             }
 
-            foreach (var connection in transformationPanel.Connections)
+            foreach (Connection connection in transformationPanel.Connections)
             {
-                var line = new TransConnector(connection);
+                TransConnector line = new TransConnector(connection);
                 Connections.Add(line);
                 Grid.Append(line);
             }
 
-            foreach (var node in transformationPanel.Nodes)
+            foreach (Node node in transformationPanel.Nodes)
             {
-                var Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
+                TransNode Button = new TransNode(ModContent.Request<Texture2D>(node.IconPath), node);
                 Nodes.Add(Button);
                 Grid.Append(Button);
             }
@@ -171,7 +171,7 @@ namespace DBZGoatLib.UI
 
         private void DrawMasteryBar(SpriteBatch spriteBatch)
         {
-            var Player = Main.CurrentPlayer.GetModPlayer<GPlayer>();
+            GPlayer Player = Main.CurrentPlayer.GetModPlayer<GPlayer>();
 
             if (string.IsNullOrEmpty(ActiveForm) && string.IsNullOrEmpty(HoveredForm))
                 return;
@@ -209,16 +209,13 @@ namespace DBZGoatLib.UI
         {
             if (string.IsNullOrEmpty(ActiveForm))
                 return;
-            else
+            if (Defaults.MasteryPaths.TryGetValue(ActiveForm, out string path))
             {
-                if (Defaults.MasteryPaths.TryGetValue(ActiveForm, out string path))
-                {
-                    Tooltip = string.Format("{0:P2} Mastery", Defaults.GetMastery(Main.CurrentPlayer, ActiveForm));
-                }
-                else
-                    Tooltip = string.Format("{0:P2} Mastery", Main.CurrentPlayer.GetModPlayer<GPlayer>().GetMastery(TransformationHandler.GetTransformation(ActiveForm).Value.buffID));
+                Tooltip = string.Format("{0:P2} Mastery", Defaults.GetMastery(Main.CurrentPlayer, ActiveForm));
             }
-                
+            else
+                Tooltip = string.Format("{0:P2} Mastery", Main.CurrentPlayer.GetModPlayer<GPlayer>().GetMastery(TransformationHandler.GetTransformation(ActiveForm).Value.buffID));
+
         }
         private void PrevTree(UIMouseEvent evt, UIElement listeningElement)
         {

@@ -30,9 +30,9 @@ namespace DBZGoatLib.Layers {
             GPlayer modPlayer = drawInfo.drawPlayer.GetModPlayer<GPlayer>();
 
             if (TransformationHandler.IsTransformed(drawInfo.drawPlayer)) {
-                var forms = TransformationHandler.GetAllCurrentForms(drawInfo.drawPlayer);
+                TransformationInfo[] forms = TransformationHandler.GetAllCurrentForms(drawInfo.drawPlayer);
 
-                foreach (var data in forms.Where(x => x.stackable).Select(x => x.animationData)) {
+                foreach (AnimationData data in forms.Where(x => x.stackable).Select(x => x.animationData)) {
                     if (data.Aura.Equals(new AuraData()))
                         continue;
                     DrawAura(modPlayer, data.Aura, TransformationHandler.IsTransformed(drawInfo.drawPlayer, true) ? 1.5f : 1f);
@@ -45,7 +45,7 @@ namespace DBZGoatLib.Layers {
             Texture2D texture = aura.GetTexture();
 
             Rectangle rectangle = new Rectangle(0, aura.GetHeight() * modPlayer.techniqueCurrentFrame, texture.Width, aura.GetHeight());
-            var samplerState = Main.DefaultSamplerState;
+            SamplerState samplerState = Main.DefaultSamplerState;
             if (modPlayer.Player.mount.Active)
                 samplerState = LegacyPlayerRenderer.MountedSamplerState;
 

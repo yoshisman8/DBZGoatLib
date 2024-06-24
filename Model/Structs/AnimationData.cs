@@ -52,7 +52,7 @@ namespace DBZGoatLib.Model {
         public override bool Equals(object obj) {
             if (obj is not AnimationData || obj == null) return false;
 
-            var a1 = (AnimationData)obj;
+            AnimationData a1 = (AnimationData)obj;
 
             return a1.Sparks == Sparks &&
                 a1.HairPath == HairPath &&
@@ -113,7 +113,8 @@ namespace DBZGoatLib.Model {
             float num1;
             Vector2 vector2;
 
-            dynamic DBZModPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null, new object[] { modPlayer.Player });
+            dynamic DBZModPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetMethod("ModPlayer").Invoke(null,
+                [modPlayer.Player]);
 
             if (DBZModPlayer.isFlying) {
                 int num2 = (int)Math.Floor((modPlayer.Player).height * 0.75);
@@ -152,7 +153,7 @@ namespace DBZGoatLib.Model {
         public override bool Equals(object obj) {
             if (obj is not AuraData || obj == null) return false;
 
-            var a1 = (AuraData)obj;
+            AuraData a1 = (AuraData)obj;
 
             return a1.AuraPath == AuraPath &&
                 a1.Frames == Frames &&
@@ -193,7 +194,7 @@ namespace DBZGoatLib.Model {
         public override bool Equals(object obj) {
             if (obj is not SoundData || obj == null) return false;
 
-            var a1 = (SoundData)obj;
+            SoundData a1 = (SoundData)obj;
 
             return a1.StartAudioPath == StartAudioPath &&
                 a1.LoopAudioPath == LoopAudioPath &&

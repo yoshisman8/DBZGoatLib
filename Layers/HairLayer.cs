@@ -27,8 +27,8 @@ namespace DBZGoatLib.Layers {
 
             if (TransformationHandler.IsTransformed(drawInfo.drawPlayer)) {
 
-                var form = TransformationHandler.GetCurrentTransformation(drawInfo.drawPlayer);
-                var stackable = TransformationHandler.GetCurrentStackedTransformation(drawInfo.drawPlayer);
+                TransformationInfo? form = TransformationHandler.GetCurrentTransformation(drawInfo.drawPlayer);
+                TransformationInfo? stackable = TransformationHandler.GetCurrentStackedTransformation(drawInfo.drawPlayer);
 
                 if (stackable.HasValue && !form.HasValue)
                     if (string.IsNullOrEmpty(stackable.Value.animationData.HairPath))
@@ -47,8 +47,8 @@ namespace DBZGoatLib.Layers {
         {
             Player drawPlayer = drawInfo.drawPlayer;
 
-            var x = drawInfo.Position.X - Main.screenPosition.X - (drawPlayer.bodyFrame.Width / 2) + drawPlayer.width / 2;
-            var y = drawInfo.Position.Y - Main.screenPosition.Y + drawPlayer.height - drawPlayer.bodyFrame.Height + 4f;
+            float x = drawInfo.Position.X - Main.screenPosition.X - (drawPlayer.bodyFrame.Width / 2) + drawPlayer.width / 2;
+            float y = drawInfo.Position.Y - Main.screenPosition.Y + drawPlayer.height - drawPlayer.bodyFrame.Height + 4f;
             Vector2 vector = new Vector2((int)x, (int)y) + drawPlayer.headPosition + drawInfo.hairOffset;
 
             vector -= CalcRotation(drawPlayer.headRotation);
