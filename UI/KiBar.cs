@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
@@ -32,7 +33,7 @@ namespace DBZGoatLib.UI
         private KiBlobComponent KiBlob;
 
         private bool Hovering;
-        private List<float> CleanAverageKi = new();
+        private List<float> CleanAverageKi = [];
         public static float AverageKi = 0;
         public static int MaxKi = 1;
 
@@ -44,35 +45,36 @@ namespace DBZGoatLib.UI
             {
                 return GetTransformationColor() ?? GetTraitColor() ?? DefaultColor;
             }
-            else return GetTraitColor() ?? DefaultColor;
+
+            return GetTraitColor() ?? DefaultColor;
         }
         internal static Gradient GetTraitColor()
         {
             if (DBZConfig.Instance.UseNewKiBar)
                 return null;
 
-            var trait = TraitHandler.GetTraitByName(Main.CurrentPlayer.GetModPlayer<GPlayer>().Trait);
+            TraitInfo? trait = TraitHandler.GetTraitByName(Main.CurrentPlayer.GetModPlayer<GPlayer>().Trait);
             if (trait.HasValue)
                 if (trait.Value.Color != null)
                     return trait.Value.Color;
                 else return null;
-            else return null;
+            return null;
         }
         internal static Color GetBlobColor()
         {
-            var trait = TraitHandler.GetTraitByName(Main.CurrentPlayer.GetModPlayer<GPlayer>().Trait);
+            TraitInfo? trait = TraitHandler.GetTraitByName(Main.CurrentPlayer.GetModPlayer<GPlayer>().Trait);
             if (trait.HasValue)
                 if (trait.Value.Color != null)
                     return trait.Value.Color.GetColor(0f);
                 else return DefaultColor.GetColor(0f);
-            else return DefaultColor.GetColor(0f);
+            return DefaultColor.GetColor(0f);
         }
         internal static Gradient GetTransformationColor()
         {
-            var transForm = TransformationHandler.GetAllCurrentForms(Main.CurrentPlayer);
+            TransformationInfo[] transForm = TransformationHandler.GetAllCurrentForms(Main.CurrentPlayer);
             if (transForm.Any(x => x.KiBarGradient != null))
                 return transForm.First(x => x.KiBarGradient != null).KiBarGradient;
-            else return null;
+            return null;
         }
 
         public override void OnInitialize()
@@ -174,8 +176,8 @@ namespace DBZGoatLib.UI
             base.Update(gameTime);
             if (Hovering && !DBZConfig.Instance.ShowKi)
                 Main.instance.MouseText($"{(int)AverageKi}/{MaxKi}");
-            var playerClass = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
-            dynamic modPlayer = playerClass.GetMethod("ModPlayer").Invoke(null, new object[] { Main.CurrentPlayer });
+            TypeInfo playerClass = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+            dynamic modPlayer = playerClass.GetMethod("ModPlayer").Invoke(null, [Main.CurrentPlayer]);
             int maxKi = (int)playerClass.GetMethod("OverallKiMax").Invoke(modPlayer, null);
             float currentKi = (float)playerClass.GetMethod("GetKi").Invoke(modPlayer, null);
 

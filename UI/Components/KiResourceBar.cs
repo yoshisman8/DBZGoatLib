@@ -23,7 +23,7 @@ namespace DBZGoatLib.UI.Components
 
             float clamp = Utils.Clamp(Quotient, 0f, 1f);
 
-            var hitbox = GetDimensions().ToRectangle();
+            Rectangle hitbox = GetDimensions().ToRectangle();
 
             int left = hitbox.Left;
             int right = hitbox.Right;

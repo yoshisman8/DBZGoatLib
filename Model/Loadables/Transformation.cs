@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 using DBZGoatLib.Handlers;
@@ -104,9 +105,10 @@ namespace DBZGoatLib.Model {
         {
             tip = BuildTooltip();
         }
+        
         public string BuildTooltip() {
-            var dmg = damageMulti - 1f;
-            var speed = speedMulti - 1f;
+            float dmg = damageMulti - 1f;
+            float speed = speedMulti - 1f;
 
             float num1 = 60f * kiDrainRate;
             float num2 = 60f * kiDrainRateWithMastery;
@@ -134,11 +136,11 @@ namespace DBZGoatLib.Model {
         }
 
         public override void Update(Player player, ref int buffIndex) {
-            var MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+            TypeInfo MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
 
-            dynamic modPlayer = MyPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { player });
-            var KiDamage = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetField("KiDamage");
-            var KiDrainRate = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetField("kiDrainMulti");
+            dynamic modPlayer = MyPlayer.GetMethod("ModPlayer").Invoke(null, [player]);
+            FieldInfo KiDamage = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetField("KiDamage");
+            FieldInfo KiDrainRate = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer")).GetField("kiDrainMulti");
 
             if (modPlayer.IsKiDepleted() || (TransformationHandler.IsAnythingBut(player, Type) && !Stackable())) {
                 TransformationHandler.ClearTransformations(player);

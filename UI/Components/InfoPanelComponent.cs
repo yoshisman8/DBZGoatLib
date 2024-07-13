@@ -4,6 +4,7 @@ using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
@@ -74,8 +75,8 @@ namespace DBZGoatLib.UI.Components
         {
             base.Update(gameTime);
 
-            var MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
-            dynamic instance = MyPlayer.GetMethod("ModPlayer").Invoke(null, new object[] { Main.CurrentPlayer });
+            TypeInfo MyPlayer = DBZGoatLib.DBZMOD.Value.mod.Code.DefinedTypes.First(x => x.Name.Equals("MyPlayer"));
+            dynamic instance = MyPlayer.GetMethod("ModPlayer").Invoke(null, [Main.CurrentPlayer]);
 
             float KiDamage = (float)instance.KiDamage;
             float KiCrit = (int)instance.kiCrit;
